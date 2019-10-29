@@ -35,6 +35,6 @@ setup (name = 'PyRPIO',
        author_email = 'samtec-ash@samtec.com',
        url = 'https://docs.python.org/extending/building',
        long_description = '''Python-wrapped RPIO.''',
-       packages=find_packages(),
-       ext_modules = [rpiolib, mdiolib]
+       ext_modules = [rpiolib, mdiolib],
+       packages=find_packages()
 )
