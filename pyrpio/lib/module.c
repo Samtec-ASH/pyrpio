@@ -78,8 +78,9 @@ static PyObject *py_rpio_gpio_get_pud(PyObject *self, PyObject *args) {
 
 static PyMethodDef RPIOMethods[] = {
   {"rpio_init", py_rpio_init, METH_VARARGS, "RPIO Open"},
-  {"rpio_gpio_fsel", py_rpio_gpio_fsel, METH_VARARGS, "GPIO set value"},
+  {"rpio_gpio_fsel", py_rpio_gpio_fsel, METH_VARARGS, "GPIO set mode"},
   {"rpio_gpio_lev", py_rpio_gpio_lev, METH_VARARGS, "GIO get value"},
+  {"rpio_gpio_write", py_rpio_gpio_write, METH_VARARGS, "GIO set value"},
   {"rpio_gpio_pad", py_rpio_gpio_pad, METH_VARARGS, "GPIO get PAD"},
   {"rpio_gpio_set_pad", py_rpio_gpio_set_pad, METH_VARARGS, "GPIO set PAD"},
   {"rpio_gpio_set_pud", py_rpio_gpio_set_pud, METH_VARARGS, "GPIO set PUD"},

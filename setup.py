@@ -1,4 +1,5 @@
 from distutils.core import setup, Extension
+from setuptools import find_packages
 
 rpiolib = Extension('pyrpio.rpiolib',
     define_macros = [
@@ -34,5 +35,6 @@ setup (name = 'PyRPIO',
        author_email = 'samtec-ash@samtec.com',
        url = 'https://docs.python.org/extending/building',
        long_description = '''Python-wrapped RPIO.''',
+       packages=find_packages(),
        ext_modules = [rpiolib, mdiolib]
 )
