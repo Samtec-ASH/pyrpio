@@ -31,6 +31,7 @@ int mdio_open(uint8_t clk_pin, uint8_t data_pin)
   bcm2835_gpio_write(data_pin, 1);
   bcm2835_gpio_fsel(data_pin, BCM2835_GPIO_FSEL_OUTP);
   bcm2835_gpio_write(data_pin, 1);
+  return 0;
 }
 
 int mdio_close(uint8_t clk_pin, uint8_t data_pin)
@@ -42,6 +43,7 @@ int mdio_close(uint8_t clk_pin, uint8_t data_pin)
   bcm2835_gpio_write(data_pin, 1);
   bcm2835_gpio_fsel(data_pin, BCM2835_GPIO_FSEL_OUTP);
   bcm2835_gpio_write(data_pin, 1);
+  return 0;
 }
 
 static void mdio_write_bit(uint8_t clk_pin, uint8_t data_pin, uint8_t val)
