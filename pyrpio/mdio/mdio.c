@@ -23,7 +23,6 @@ static void ndelay(int delay)
 
 int mdio_open(uint8_t clk_pin, uint8_t data_pin)
 {
-  bcm2835_init(1); // TODO: Done at top-level once ideally
 
   bcm2835_gpio_set_pud(data_pin, BCM2835_GPIO_PUD_UP);
   bcm2835_gpio_write(clk_pin, 0);
