@@ -1,7 +1,6 @@
 from distutils.core import setup, Extension
 
-mdio = Extension(
-    'pyrpio.mdio',
+mdiolib = Extension('pyrpio.mdiolib',
     define_macros = [
         ('MAJOR_VERSION', '1'),
         ('MINOR_VERSION', '0')\
@@ -9,8 +8,8 @@ mdio = Extension(
     include_dirs = ['/usr/local/include', 'pyrpio/lib'],
     library_dirs = ['/usr/local/lib'],
     sources = [
-        'pyrpio/mdio/module.c',
-        'pyrpio/mdio/mdio.c',
+        'pyrpio/lib/pymdio.c',
+        'pyrpio/lib/mdio.c',
         'pyrpio/lib/bcm2835.c'
     ]
 )
@@ -22,5 +21,5 @@ setup (name = 'PyRPIO',
        author_email = 'samtec-ash@samtec.com',
        url = 'https://docs.python.org/extending/building',
        long_description = '''Python-wrapped RPIO.''',
-       ext_modules = [mdio]
+       ext_modules = [mdiolib]
 )

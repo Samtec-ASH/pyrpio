@@ -51,12 +51,12 @@ static PyMethodDef MDIOMethods[] = {
 
 static struct PyModuleDef mdiomodule = {
   PyModuleDef_HEAD_INIT,
-  "mdio",
+  "mdiolib",
   "mdio module",
   -1,
   MDIOMethods
 };
 
-PyMODINIT_FUNC PyInit_mdio(void) {
+PyMODINIT_FUNC PyInit_mdiolib(void) {
   return PyModule_Create(&mdiomodule);
 }
