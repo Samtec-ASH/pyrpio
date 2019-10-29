@@ -11,7 +11,7 @@ mdio = Extension(
     sources = [
         'pyrpio/mdio/module.c',
         'pyrpio/mdio/mdio.c',
-        'pyrpio/bcm2835.c'
+        'pyrpio/lib/bcm2835.c'
     ]
 )
 
