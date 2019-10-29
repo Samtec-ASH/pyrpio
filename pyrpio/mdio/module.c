@@ -37,8 +37,8 @@ static PyObject *py_mdio_read_reg(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "BBBBH", &clk_pin, &data_pin, &pad, &dad, &reg)) {
     return NULL;
   }
-  value = mdio_read_reg(clk_pin, data_pin, pad, dad, reg);
-  return Py_BuildValue("H", value);
+  val = mdio_read_reg(clk_pin, data_pin, pad, dad, reg);
+  return Py_BuildValue("H", val);
 }
 
 static PyMethodDef MDIOMethods[] = {
