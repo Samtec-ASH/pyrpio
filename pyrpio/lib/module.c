@@ -85,7 +85,6 @@ static PyMethodDef RPIOMethods[] = {
   {"rpio_gpio_set_pad", py_rpio_gpio_set_pad, METH_VARARGS, "GPIO set PAD"},
   {"rpio_gpio_set_pud", py_rpio_gpio_set_pud, METH_VARARGS, "GPIO set PUD"},
   {"rpio_gpio_get_pud", py_rpio_gpio_get_pud, METH_VARARGS, "GPIO get PUD"},
-
   {NULL, NULL, 0, NULL}
 };
 
