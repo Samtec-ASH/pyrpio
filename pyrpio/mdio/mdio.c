@@ -21,7 +21,7 @@ static void ndelay(int delay)
   return;
 }
 
-static int mdio_open(uint8_t clk_pin, uint8_t data_pin)
+int mdio_open(uint8_t clk_pin, uint8_t data_pin)
 {
   bcm2835_gpio_set_pud(data_pin, BCM2835_GPIO_PUD_UP);
   bcm2835_gpio_write(clk_pin, 0);
@@ -33,7 +33,7 @@ static int mdio_open(uint8_t clk_pin, uint8_t data_pin)
   bcm2835_gpio_write(data_pin, 1);
 }
 
-static int mdio_close(uint8_t clk_pin, uint8_t data_pin)
+int mdio_close(uint8_t clk_pin, uint8_t data_pin)
 {
   bcm2835_gpio_write(clk_pin, 0);
   bcm2835_gpio_fsel(clk_pin, BCM2835_GPIO_FSEL_OUTP);
