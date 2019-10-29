@@ -1,5 +1,5 @@
-from distutils.core import setup, Extension
 from setuptools import find_packages
+from distutils.core import setup, Extension
 
 rpiolib = Extension('rpiolib',
     define_macros = [
