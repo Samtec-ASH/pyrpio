@@ -123,8 +123,8 @@ static PyObject *py_i2c_set_baudrate(PyObject *self, PyObject *args)
 
 static PyObject *py_i2c_set_slave_address(PyObject *self, PyObject *args)
 {
-  uint32_t addr;
-  if (!PyArg_ParseTuple(args, "I", &addr))
+  uint8_t addr;
+  if (!PyArg_ParseTuple(args, "B", &addr))
   {
     return NULL;
   }
