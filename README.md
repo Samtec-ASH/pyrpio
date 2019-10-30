@@ -12,6 +12,6 @@
 * Enable specifying I2C bus:
   - RPI 4 has 6 I2C buses
   - For older RPIs, later Raspbian images enable kernel-level bit-bang i2c.
-* Make thread safe and support
+* Make thread safe and support locking
 * Make mock version to allow testing/developing on non-RPI (MacOS, x86 Linux).
 
