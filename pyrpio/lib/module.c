@@ -156,7 +156,7 @@ static PyObject *py_i2c_write(PyObject *self, PyObject *args)
   uint32_t len;
   const char *buf;
   if (!PyArg_ParseTuple(args, "s#", &buf, &count)) { return NULL; }
-  bcm2835_i2c_write(pbuf, len);
+  bcm2835_i2c_write(buf, len);
   Py_RETURN_NONE;
 }
 
