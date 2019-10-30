@@ -149,7 +149,7 @@ int mdio_write_reg(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t dad, 
   return 0;
 }
 
-int mdio_write_add(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, u_int8_t dad, uint16_t val)
+int mdio_write_add(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t dad, uint16_t val)
 {
   int i;
   mdio_cmd(clk_pin, data_pin, MDIO_WRITE_ADD, pad, dad);
