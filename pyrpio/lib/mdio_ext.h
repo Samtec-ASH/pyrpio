@@ -1,3 +1,5 @@
+#ifndef MDIO_EXT_H
+
 #include <Python.h>
 #include "mdio.h"
 
@@ -60,26 +62,4 @@ static PyObject *py_mdio_c45_write(PyObject *self, PyObject *args) {
   return Py_BuildValue("H", rst);
 }
 
-
-static PyMethodDef MDIOMethods[] = {
-  {"mdio_init", py_mdio_init, METH_VARARGS, "MDIO Init"},
-  {"mdio_open", py_mdio_open, METH_VARARGS, "MDIO Open"},
-  {"mdio_close", py_mdio_close, METH_VARARGS, "MDIO Close"},
-  {"mdio_c22_read", py_mdio_c22_read, METH_VARARGS, "MDIO C22 Write"},
-  {"mdio_c22_write", py_mdio_c22_write, METH_VARARGS, "MDIO C22 Read"},
-  {"mdio_c45_read", py_mdio_c45_read, METH_VARARGS, "MDIO C45 Write"},
-  {"mdio_c45_write", py_mdio_c45_write, METH_VARARGS, "MDIO C45 Read"},
-  {NULL, NULL, 0, NULL}
-};
-
-static struct PyModuleDef mdiomodule = {
-  PyModuleDef_HEAD_INIT,
-  "mdiolib",
-  "mdio module",
-  -1,
-  MDIOMethods
-};
-
-PyMODINIT_FUNC PyInit_mdiolib(void) {
-  return PyModule_Create(&mdiomodule);
-}
+#endif

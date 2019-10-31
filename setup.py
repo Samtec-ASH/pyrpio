@@ -11,8 +11,7 @@ rpiolib = Extension('rpiolib',
     sources = [
         'pyrpio/lib/bcm2835.c',
         'pyrpio/lib/mdio.c',
-        'pyrpio/lib/bcm2835_ext.c',
-        'pyrpio/lib/mdio_ext.c'
+        'pyrpio/lib/module.c'
     ]
 )
 
