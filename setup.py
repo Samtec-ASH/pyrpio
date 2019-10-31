@@ -16,7 +16,7 @@ rpiolib = Extension('rpiolib',
 )
 
 setup (name = 'PyRPIO',
-       version = '1.0.0',
+       version = '0.0.1',
        description = 'Python-wrapped RPIO',
        author = 'Samtec - ASH',
        author_email = 'samtec-ash@samtec.com',

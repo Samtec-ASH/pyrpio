@@ -1,5 +1,7 @@
 # PyRPIO
 
+⚠️ **WARNING: This is a very early pre-release. Expect things to break.** ⚠️
+
 #### A Python 3 addon which provides high-speed access to the Raspberry Pi GPIO interface, supporting regular GPIO as well as i²c, PWM, and SPI.
 #### This package is inspired by [node-rpio](https://github.com/jperkin/node-rpio) which is a node.js addon.
 
