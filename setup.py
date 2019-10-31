@@ -9,22 +9,10 @@ rpiolib = Extension('rpiolib',
     include_dirs = ['/usr/local/include', 'pyrpio/lib'],
     library_dirs = ['/usr/local/lib'],
     sources = [
-        'pyrpio/lib/module.c',
-        'pyrpio/lib/bcm2835.c'
-    ]
-)
-
-mdiolib = Extension('mdiolib',
-    define_macros = [
-        ('MAJOR_VERSION', '1'),
-        ('MINOR_VERSION', '0')\
-    ],
-    include_dirs = ['/usr/local/include', 'pyrpio/lib'],
-    library_dirs = ['/usr/local/lib'],
-    sources = [
-        'pyrpio/mdio/module.c',
-        'pyrpio/mdio/mdio.c',
-        'pyrpio/lib/bcm2835.c'
+        'pyrpio/lib/bcm2835.c',
+        'pyrpio/lib/mdio.c',
+        'pyrpio/lib/bcm2835_ext.c',
+        'pyrpio/mdio/mdio_ext.c'
     ]
 )
 
@@ -36,6 +24,6 @@ setup (name = 'PyRPIO',
        url = 'https://docs.python.org/extending/building',
        long_description = '''Python-wrapped RPIO.''',
        ext_package='pyrpio',
-       ext_modules = [rpiolib, mdiolib],
+       ext_modules = [rpiolib],
        packages = find_packages()
 )
