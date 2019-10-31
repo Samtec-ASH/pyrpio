@@ -4,5 +4,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+twine = "*"
+wheel = "*"
+pytest = "*"
+pylint = "*"
 
 [packages]

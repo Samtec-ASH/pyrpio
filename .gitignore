@@ -1,5 +1,13 @@
-__pycache__/
+# OS
 .DS_Store
+# Python
+__pycache__/
 dist/
 build/
 PyRPIO.egg-info/
+# Dont enforce python version
+.python-version
+# Dont enfore IDE
+.vscode/
+# Dont enforce pkg version lock
+Pipfile.lock

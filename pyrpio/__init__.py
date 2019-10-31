@@ -6,6 +6,8 @@ import dataclasses
 from dataclasses import dataclass
 from pyrpio import rpiolib
 
+__version__ = "0.0.3"
+
 LOW = 0x0
 HIGH = 0x1
 
