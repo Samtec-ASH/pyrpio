@@ -1,6 +1,17 @@
 #include <Python.h>
 #include "mdio.h"
 
+static PyObject *py_mdio_init(PyObject *self, PyObject *args)
+{
+  int gpiomem, val;
+  if (!PyArg_ParseTuple(args, "H", &gpiomem))
+  {
+    return NULL;
+  }
+  val = bcm2835_init(gpiomem);
+  return Py_BuildValue("I", val);
+}
+
 static PyObject *py_mdio_open(PyObject *self, PyObject *args) {
   uint8_t clk_pin, data_pin;
   if (!PyArg_ParseTuple(args, "BB", &clk_pin, &data_pin)) { return NULL; }
@@ -51,6 +62,7 @@ static PyObject *py_mdio_c45_write(PyObject *self, PyObject *args) {
 
 
 static PyMethodDef MDIOMethods[] = {
+  {"mdio_init", py_mdio_init, METH_VARARGS, "MDIO Init"},
   {"mdio_open", py_mdio_open, METH_VARARGS, "MDIO Open"},
   {"mdio_close", py_mdio_close, METH_VARARGS, "MDIO Close"},
   {"mdio_c22_read", py_mdio_c22_read, METH_VARARGS, "MDIO C22 Write"},

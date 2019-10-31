@@ -1,8 +1,21 @@
 from typing import List
 from pyrpio import mdiolib
+from pyrpio import RPIOOptions
+
+mdio_inited = False
+mdio_options: RPIOOptions = RPIOOptions()
+def configure(options: RPIOOptions):
+    global mdio_inited
+    global mdio_options
+    if not mdio_inited:
+        mdiolib.mdio_init(1 if options.gpiomem else 0)
+        mdio_inited = True
+        mdio_options = options
 
 class MDIO:
     def __init__(self, clk_pin: int, data_pin: int):
+        if not mdio_inited:
+            configure(mdio_options)
         self.clk_pin = clk_pin
         self.data_pin = data_pin
 

@@ -188,7 +188,7 @@ def pin_to_gpio(options: RPIOOptions, pin):
     if pincache and pin in pincache:
         return pincache[pin]
     if options.mapping == RPIOMapping.physical:
-        gpio_pin = pinmaps[RPIOMapping.physical][pin]
+        gpio_pin = pinmaps[detect_pinmap()][pin]
     elif options.mapping == RPIOMapping.gpio:
         gpio_pin = pin
     if gpio_pin < 0:
@@ -201,4 +201,5 @@ def configure(options: RPIOOptions):
     global rpio_inited
     if not rpio_inited:
         rpiolib.rpio_init(1 if options.gpiomem else 0)
+    rpio_inited = True
     rpio_options = options
