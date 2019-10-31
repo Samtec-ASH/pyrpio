@@ -1,6 +1,5 @@
 from typing import List
 from pyrpio import rpiolib
-from pyrpio import RPIOOptions
 
 class MDIO:
     def __init__(self, clk_pin: int, data_pin: int):
