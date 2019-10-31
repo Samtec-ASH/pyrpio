@@ -87,9 +87,8 @@ static void mdio_flush(uint8_t clk_pin, uint8_t data_pin){
 }
 
 static void mdio_cmd(uint8_t clk_pin, uint8_t data_pin, int sf, int op, uint8_t pad, uint8_t dad){
-  int i;
   // Preamble
-  for (i = 0; i < 32; i++){ mdio_write_bit(clk_pin, data_pin, 1); }
+  mdio_flush(clk_pin, data_pin);
   // Header
   mdio_write_bits(clk_pin, data_pin, pad, sf & 3);  // Start frame
   mdio_write_bits(clk_pin, data_pin, pad, op & 3);  // OP Code
@@ -98,7 +97,7 @@ static void mdio_cmd(uint8_t clk_pin, uint8_t data_pin, int sf, int op, uint8_t 
 }
 
 uint16_t mdio_c22_read(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t dad){
-  int ret, i;
+  int ret;
   // Send preamble/header
   mdio_cmd(clk_pin, data_pin, MDIO_C22_FRAME, MDIO_OP_C22_RD, pad, dad);
   // Release data pin
@@ -116,7 +115,6 @@ uint16_t mdio_c22_read(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t d
 }
 
 int mdio_c22_write(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t dad, uint16_t val){
-  int i;
   // Send preamble/header
   mdio_cmd(clk_pin, data_pin, MDIO_C22_FRAME, MDIO_OP_C22_WR, pad, dad);
   // Send the turnaround (10)
@@ -128,7 +126,6 @@ int mdio_c22_write(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t dad, 
 }
 
 int mdio_c45_write_addr(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t dad, uint16_t reg){
-  int i;
   // Send preamble/header - C45 - ADDR
   mdio_cmd(clk_pin, data_pin, MDIO_C45_FRAME, MDIO_OP_C45_AD, pad, dad);
   // Send the turnaround (10)
@@ -140,7 +137,6 @@ int mdio_c45_write_addr(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t 
 }
 
 int mdio_c45_write_val(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t dad, uint16_t val){
-  int i;
   // Send preamble/header - C45 - WRITE
   mdio_cmd(clk_pin, data_pin, MDIO_C45_FRAME, MDIO_OP_C45_WR, pad, dad);
   // Send the turnaround (10)
@@ -152,7 +148,7 @@ int mdio_c45_write_val(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t d
 }
 
 uint16_t mdio_c45_read_val(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t dad){
-  int ret, i;
+  int ret;
   // Send preamble/header
   mdio_cmd(clk_pin, data_pin, MDIO_C45_FRAME, MDIO_OP_C45_RD, pad, dad);
   // Release data pin
