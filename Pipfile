@@ -10,3 +10,4 @@ pytest = "*"
 pylint = "*"
 
 [packages]
+spidev = "*"
