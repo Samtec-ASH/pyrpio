@@ -7,8 +7,6 @@
 
 ![PyPI](https://img.shields.io/pypi/v/pyrpio)
 
-Raspberry Pi Models: A, B (revisions 1.0 and 2.0), A+, B+, 2, 3, 3+, 3 A+, 4, Compute Module 3, Zero.
-
 # Compatibility
 * Raspberry Pi Models: A, B (revisions 1.0 and 2.0), A+, B+, 2, 3, 3+, 3 A+, 4, Compute Module 3, Zero.
 * Python 3.7+
