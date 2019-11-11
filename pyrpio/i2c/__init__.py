@@ -1,2 +1,1 @@
-from .i2c import I2C
-from .register_device import I2CRegisterDevice
+from .register_device import I2CRegisterDevice, I2C

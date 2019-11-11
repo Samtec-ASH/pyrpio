@@ -1,6 +1,5 @@
-import struct
 from fcntl import ioctl
-from typing import List, Optional, IO
+from typing import Optional, IO
 
 
 class I2CException(Exception):
