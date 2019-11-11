@@ -16,12 +16,15 @@
 #define MDIO_READ_DELAY 50
 #define MDIO_DELAY_SETUP 10
 
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
 #define noop ((void)0)
-
-static void ndelay(int delay){
+static void ndelay(long delay){
   while (delay-- > 0){ noop;}
   return;
 }
+#pragma GCC pop_options
+
 
 int mdio_open(uint8_t clk_pin, uint8_t data_pin){
   bcm2835_gpio_write(clk_pin, 0);
@@ -86,14 +89,15 @@ static void mdio_flush(uint8_t clk_pin, uint8_t data_pin){
   for (i = 0; i < 32; i++){ mdio_write_bit(clk_pin, data_pin, 1); }
 }
 
-static void mdio_cmd(uint8_t clk_pin, uint8_t data_pin, int sf, int op, uint8_t pad, uint8_t dad){
+static void mdio_cmd(uint8_t clk_pin, uint8_t data_pin, uint8_t sf, uint8_t op, uint8_t pad, uint8_t dad){
   // Preamble
   mdio_flush(clk_pin, data_pin);
   // Header
-  mdio_write_bits(clk_pin, data_pin, pad, sf & 3);  // Start frame
-  mdio_write_bits(clk_pin, data_pin, pad, op & 3);  // OP Code
+  mdio_write_bits(clk_pin, data_pin, sf & 3, 2);    // Start frame
+  mdio_write_bits(clk_pin, data_pin, op & 3, 2);    // OP Code
   mdio_write_bits(clk_pin, data_pin, pad, 5);       // Phy addr
   mdio_write_bits(clk_pin, data_pin, dad, 5);       // Reg addr (C22) / dev type (C45)
+  // printf("CMD: |%u|%u|%u|%u|\n", sf & 3, op & 3, pad, dad);
 }
 
 uint16_t mdio_c22_read(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t dad){
@@ -132,7 +136,6 @@ int mdio_c45_write_addr(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t 
   mdio_write_bits(clk_pin, data_pin, 2, 2);
   // Send 16-bit value
   mdio_write_bits(clk_pin, data_pin, reg, 16);
-  mdio_flush(clk_pin, data_pin);
   return 0;
 }
 
@@ -143,7 +146,7 @@ int mdio_c45_write_val(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t d
   mdio_write_bits(clk_pin, data_pin, 2, 2);
   // Send 16-bit value
   mdio_write_bits(clk_pin, data_pin, val, 16);
-  mdio_flush(clk_pin, data_pin);
+  mdio_flush(clk_pin, data_pin); //  NOTE: This shouldnt be needed
   return 0;
 }
 
