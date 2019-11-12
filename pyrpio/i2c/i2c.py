@@ -1,12 +1,21 @@
+'''
+Create a controller to perform operations on an I2C bus
+'''
 from fcntl import ioctl
 from typing import Optional, IO
 
 
 class I2CException(Exception):
-    pass
+    '''
+    Exceptions that occur during i2c operations. (before OS level ops)
+    '''
+    ...
 
 
 class I2C:
+    '''
+    Controller to handle an I2C bus
+    '''
     I2C_SLAVE = 0x0703
 
     def __init__(self, path: str = '/dev/i2c-1'):

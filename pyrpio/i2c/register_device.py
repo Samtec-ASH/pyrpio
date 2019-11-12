@@ -1,13 +1,19 @@
+'''
+Create a generic register device that runs over I2C
+'''
 import struct
 from typing import Collection, Tuple
 
 from .i2c import I2C
 
 
-format_size = {1: 'B', 2: 'H', 4: 'I', 8: 'Q'}
+FORMAT_SIZE = {1: 'B', 2: 'H', 4: 'I', 8: 'Q'}
 
 
 class I2CRegisterDevice:
+    '''
+    Generic I2C device that implements registers
+    '''
 
     def __init__(self, bus: I2C, address: int, register_size: int = 1, data_size: int = 1):
         '''
@@ -84,7 +90,7 @@ class I2CRegisterDevice:
         '''
         self._bus.set_address(self._address)
         data_bytes = self.read_register_sequential_bytes(register, length)
-        return struct.unpack(f'>{length}{format_size[self._data_size]}', data_bytes)
+        return struct.unpack(f'>{length}{FORMAT_SIZE[self._data_size]}', data_bytes)
 
     def read_register_sequential_bytes(self, register: int, length: int) -> bytes:
         '''
@@ -112,7 +118,7 @@ class I2CRegisterDevice:
             data (Collection[int]): [description]
         '''
         self.write_register_sequential_bytes(register, struct.pack(
-            f'>{len(data)}{format_size[self._data_size]}', *data))
+            f'>{len(data)}{FORMAT_SIZE[self._data_size]}', *data))
 
     def write_register_sequential_bytes(self, register: int, data: bytes):
         '''
