@@ -8,6 +8,7 @@ twine = "*"
 wheel = "*"
 pytest = "*"
 pylint = "*"
+autopep8 = "*"
 
 [packages]
 spidev = "*"
