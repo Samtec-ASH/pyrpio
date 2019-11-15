@@ -1,0 +1,41 @@
+image: python:3.7
+
+pipelines:
+  default:
+    - step:
+        name: Build and test
+        max-time: 10
+        caches:
+          - pip
+        script:
+          - pip install pylint pytest
+          - pylint pyrpio
+    - step:
+        name: Deploy to test
+        deployment: test
+        max-time: 10
+        caches:
+          - pip
+        script:
+          - pip install pylint pytest
+          - pylint pyrpio
+    - step:
+        name: Deploy to staging
+        deployment: staging
+        max-time: 10
+        caches:
+          - pip
+        script:
+          - pip install twine wheel
+          - python setup.py sdist
+    - step:
+        name: Deploy to production
+        deployment: production
+        max-time: 10
+        caches:
+          - pip
+        trigger: manual
+        script:
+          - pip install twine wheel
+          - python setup.py sdist
+          - twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --skip-existing dist/*

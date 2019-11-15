@@ -11,4 +11,4 @@ pylint = "*"
 autopep8 = "*"
 
 [packages]
-spidev = "*"
+spidev = {version = "*", os_name = "== 'linux'"}
