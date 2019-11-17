@@ -1,3 +1,7 @@
+''' SPI interface.
+Adapted from python-periphery (https://github.com/vsergeev/python-periphery/blob/master/periphery/spi.py)
+Modified to support 3-wire mode (MOSI & MISO tied)
+'''
 import os
 from typing import Union, List, Optional
 import fcntl
@@ -15,8 +19,8 @@ class SPIError(IOError):
 
 class _CSpiIocTransfer(ctypes.Structure):
     _fields_ = [
-        ('tx_buf', ctypes.c_ulonglong),  # ctypes.POINTER(ctypes.c_ulonglong)),
-        ('rx_buf', ctypes.c_ulonglong),  # ctypes.POINTER(ctypes.c_ulonglong)),
+        ('tx_buf', ctypes.c_ulonglong),
+        ('rx_buf', ctypes.c_ulonglong),
         ('len', ctypes.c_uint),
         ('speed_hz', ctypes.c_uint),
         ('delay_usecs', ctypes.c_ushort),
@@ -147,6 +151,8 @@ class SPI(object):
             ValueError: if data is not valid bytes.
 
         """
+        if self._fd is None:
+            raise SPIError('SPI bus is not open')
         if tx_data and not isinstance(tx_data, (bytes, bytearray, list)):
             raise TypeError("Invalid data type, should be bytes, bytearray, or list.")
         if rx_data and not isinstance(rx_data, (bytes, bytearray, list)):
@@ -226,7 +232,6 @@ class SPI(object):
         return self._devpath
 
     # Mutable properties
-
     def _get_mode(self):
         buf = array.array('B', [0])
 

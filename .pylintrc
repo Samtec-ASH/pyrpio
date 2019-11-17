@@ -1,0 +1,8 @@
+[MASTER]
+
+[MESSAGES CONTROL]
+
+[FORMAT]
+max-line-length=120
+
+good-names=st,op

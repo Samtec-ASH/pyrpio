@@ -3,17 +3,14 @@ Create a generic register device that runs over I2C
 '''
 import struct
 from typing import Collection, Tuple
-
-from .i2c import I2C
-
-
-FORMAT_SIZE = {1: 'B', 2: 'H', 4: 'I', 8: 'Q'}
+from pyrpio.i2c import I2C
 
 
 class I2CRegisterDevice:
     '''
     Generic I2C device that implements registers
     '''
+    FORMAT_SIZE = {1: 'B', 2: 'H', 4: 'I', 8: 'Q'}
 
     def __init__(self, bus: I2C, address: int, register_size: int = 1, data_size: int = 1):
         '''
@@ -32,10 +29,10 @@ class I2CRegisterDevice:
 
     def read_register(self, register: int) -> int:
         '''
-        [summary]
+        Read single register as int
 
         Args:
-            register (int): [description]
+            register (int): Register address
 
         Returns:
             int: [description]
@@ -44,10 +41,10 @@ class I2CRegisterDevice:
 
     def read_register_bytes(self, register: int) -> bytes:
         '''
-        [summary]
+        Read single register as bytes
 
         Args:
-            register (int): [description]
+            register (int): Register address
 
         Returns:
             bytes: [description]
@@ -57,21 +54,21 @@ class I2CRegisterDevice:
 
     def write_register(self, register: int, data: int):
         '''
-        [summary]
+        Write int data to signle register.
 
         Args:
-            register (int): [description]
-            data (int): [description]
+            register (int): Register address
+            data (int): Register value as int
         '''
         self.write_register_bytes(register, data.to_bytes(length=self._data_size, byteorder='big'))
 
     def write_register_bytes(self, register: int, data: bytes):
         '''
-        [summary]
+        Write bytes data to single register.
 
         Args:
-            register (int): [description]
-            data (bytes): [description]
+            register (int): Register address
+            data (bytes): Register value as raw bytes
         '''
         self._bus.set_address(self._address)
         message = register.to_bytes(length=self._register_size, byteorder='big') + data
@@ -79,29 +76,31 @@ class I2CRegisterDevice:
 
     def read_register_sequential(self, register: int, length: int) -> Tuple[int]:
         '''
-        [summary]
+        Read sequential registers by issuing repeated i2c starts to increment address.
+        Ensure device supports auto-incrementing address on repeated starts.
 
         Args:
-            register (int): [description]
-            length (int): [description]
+            register (int): Start register address
+            length (int): Number of registers to read
 
         Returns:
-            Tuple[int]: [description]
+            Tuple[int]: Register values
         '''
         self._bus.set_address(self._address)
         data_bytes = self.read_register_sequential_bytes(register, length)
-        return struct.unpack(f'>{length}{FORMAT_SIZE[self._data_size]}', data_bytes)
+        return struct.unpack(f'>{length}{I2CRegisterDevice.FORMAT_SIZE[self._data_size]}', data_bytes)
 
     def read_register_sequential_bytes(self, register: int, length: int) -> bytes:
         '''
-        [summary]
+        Read sequential registers by issuing repeated i2c starts to increment address.
+        Ensure device supports auto-incrementing address on repeated starts.
 
         Args:
-            register (int): [description]
-            length (int): [description]
+            register (int): Start register address
+            length (int): Number of registers to read
 
         Returns:
-            bytes: [description]
+            bytes: Register values as raw bytes
         '''
         self._bus.set_address(self._address)
         return self._bus.read_write(
@@ -111,22 +110,24 @@ class I2CRegisterDevice:
 
     def write_register_sequential(self, register: int, data: Collection[int]):
         '''
-        [summary]
+        Write sequential registers by issuing repeated i2c starts to increment address.
+        Ensure device supports auto-incrementing address on repeated starts.
 
         Args:
-            register (int): [description]
-            data (Collection[int]): [description]
+            register (int): Start register address
+            data (Collection[int]): Register values to write
         '''
         self.write_register_sequential_bytes(register, struct.pack(
-            f'>{len(data)}{FORMAT_SIZE[self._data_size]}', *data))
+            f'>{len(data)}{I2CRegisterDevice.FORMAT_SIZE[self._data_size]}', *data))
 
     def write_register_sequential_bytes(self, register: int, data: bytes):
         '''
-        [summary]
+        Write sequential registers by issuing repeated i2c starts to increment address.
+        Ensure device supports auto-incrementing address on repeated starts.
 
         Args:
-            register (int): [description]
-            data (bytes): [description]
+            register (int): Start egister address
+            data (bytes): Raw bytes to write
         '''
         self._bus.set_address(self._address)
         message = register.to_bytes(length=self._register_size, byteorder='big') + data
