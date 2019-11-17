@@ -2,7 +2,14 @@
 
 [MESSAGES CONTROL]
 
-[FORMAT]
-max-line-length=120
+disable=broad-except,duplicate-code,attribute-defined-outside-init
 
-good-names=st,op
+[FORMAT]
+max-line-length=140
+
+good-names=st,op,fp,t,e,i,j,fd,p
+
+[DESIGN]
+max-attributes=15
+max-args=10
+max-branches=15

@@ -187,7 +187,7 @@ class MDIOSPI:
 
     def open(self, speed_hz: int = 5000):
         ''' Open mdio bus. '''
-        self._bus = SPI(self.path, 0, speed_hz, extra_flags=SPI._SPI_3WIRE)
+        self._bus = SPI(self.path, 0, speed_hz, extra_flags=SPI.SPI_3WIRE)
 
     def close(self):
         ''' Close mdio bus. '''

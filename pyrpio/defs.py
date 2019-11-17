@@ -1,3 +1,4 @@
+''' PyRPIO definitions: enums and dataclasses. '''
 from enum import Enum
 from typing import Optional, List
 from dataclasses import dataclass
@@ -20,19 +21,20 @@ POLL_BOTH = 0x3
 PAD_GROUP_0_27 = 0x0
 PAD_GROUP_28_45 = 0x1
 PAD_GROUP_46_53 = 0x2
-PAD_DRIVE_2mA = 0x00
-PAD_DRIVE_4mA = 0x01
-PAD_DRIVE_6mA = 0x02
-PAD_DRIVE_8mA = 0x03
-PAD_DRIVE_10mA = 0x04
-PAD_DRIVE_12mA = 0x05
-PAD_DRIVE_14mA = 0x06
-PAD_DRIVE_16mA = 0x07
+PAD_DRIVE_2MA = 0x00
+PAD_DRIVE_4MA = 0x01
+PAD_DRIVE_6MA = 0x02
+PAD_DRIVE_8MA = 0x03
+PAD_DRIVE_10MA = 0x04
+PAD_DRIVE_12MA = 0x05
+PAD_DRIVE_14MA = 0x06
+PAD_DRIVE_16MA = 0x07
 PAD_HYSTERESIS = 0x08
 PAD_SLEW_UNLIMITED = 0x10
 
 
 class PinMapName(str, Enum):
+    ''' Board pin map name. '''
     PINMAP_26_R1 = 'PINMAP_26_R1'
     PINMAP_26 = 'PINMAP_26'
     PINMAP_40 = 'PINMAP_40'
@@ -51,8 +53,8 @@ PINMAP_26_R1_MAPPING: List[int] = [
     -1, 24,  # P17  P18 #
     10, -1,  # P19  P20 #
     9, 25,   # P21  P22 #
-    11,  8,  # P23  P24 #
-    -1,  7   # P25  P26 #
+    11, 8,   # P23  P24 #
+    -1, 7    # P25  P26 #
 ]
 
 
@@ -69,8 +71,8 @@ PINMAP_26_MAPPING: List[int] = [
     -1, 24,  # P17  P18 #
     10, -1,  # P19  P20 #
     9, 25,   # P21  P22 #
-    11,  8,  # P23  P24 #
-    -1,  7   # P25  P26 #
+    11, 8,   # P23  P24 #
+    -1, 7    # P25  P26 #
 ]
 
 PINMAP_40_MAPPING: List[int] = [
@@ -86,9 +88,9 @@ PINMAP_40_MAPPING: List[int] = [
     -1, 24,  # P17  P18 #
     10, -1,  # P19  P20 #
     9, 25,   # P21  P22 #
-    11,  8,  # P23  P24 #
-    -1,  7,  # P25  P26 #
-    0,  1,   # P27  P28 #
+    11, 8,   # P23  P24 #
+    -1, 7,   # P25  P26 #
+    0, 1,    # P27  P28 #
     5, -1,   # P29  P30 #
     6, 12,   # P31  P32 #
     13, -1,  # P33  P34 #
@@ -101,7 +103,6 @@ PIN_MAPPINGS = {
     PinMapName.PINMAP_26_R1: PINMAP_26_R1_MAPPING,
     # Original Raspberry Pi, PCB revision 2.0.
     # Differs to R1 on pins 3, 5, and 13.
-    # XXX: no support yet for the P5 header pins.
     PinMapName.PINMAP_26: PINMAP_26_MAPPING,
     # Raspberry Pi 40-pin models.
     # First 26 pins are the same as PINMAP_26.
@@ -110,11 +111,13 @@ PIN_MAPPINGS = {
 
 
 class RPIOMapping(str, Enum):
+    ''' Pin mapping convention: physical or gpio. '''
     physical = 'physical'
     gpio = 'gpio'
 
 
 class RPIOBoard(str, Enum):
+    ''' Board names. '''
     RASPI_B_R1 = 'RASPI_B_R1'
     RASPI_A = 'RASPI_A'
     RASPI_B = 'RASPI_B'
@@ -129,6 +132,7 @@ class RPIOBoard(str, Enum):
 
 @dataclass
 class RPIOConfigs:
+    ''' PyRPIO configuration options. '''
     gpiomem: bool = True
     mapping: RPIOMapping = RPIOMapping.physical
     mock: Optional[RPIOBoard] = None

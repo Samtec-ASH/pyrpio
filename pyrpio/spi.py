@@ -14,10 +14,10 @@ ByteLike = Union[bytes, bytearray, List[int]]
 
 class SPIError(IOError):
     """Base class for SPI errors."""
-    pass
 
 
 class _CSpiIocTransfer(ctypes.Structure):
+    # pylint: disable=too-few-public-methods
     _fields_ = [
         ('tx_buf', ctypes.c_ulonglong),
         ('rx_buf', ctypes.c_ulonglong),
@@ -32,12 +32,13 @@ class _CSpiIocTransfer(ctypes.Structure):
     ]
 
 
-class SPI(object):
+class SPI:
+    ''' SPI class interface. '''
+    SPI_3WIRE = 0x10
     # Constants scraped from <linux/spi/spidev.h>
     _SPI_CPHA = 0x1
     _SPI_CPOL = 0x2
     _SPI_LSB_FIRST = 0x8
-    _SPI_3WIRE = 0x10
     _SPI_IOC_WR_MODE = 0x40016b01
     _SPI_IOC_RD_MODE = 0x80016b01
     _SPI_IOC_WR_MAX_SPEED_HZ = 0x40046b04
@@ -84,24 +85,24 @@ class SPI(object):
     def _open(self, devpath, mode, max_speed, bit_order, bits_per_word, extra_flags):
         if not isinstance(devpath, str):
             raise TypeError("Invalid devpath type, should be string.")
-        elif not isinstance(mode, int):
+        if not isinstance(mode, int):
             raise TypeError("Invalid mode type, should be integer.")
-        elif not isinstance(max_speed, (int, float)):
+        if not isinstance(max_speed, (int, float)):
             raise TypeError("Invalid max_speed type, should be integer or float.")
-        elif not isinstance(bit_order, str):
+        if not isinstance(bit_order, str):
             raise TypeError("Invalid bit_order type, should be string.")
-        elif not isinstance(bits_per_word, int):
+        if not isinstance(bits_per_word, int):
             raise TypeError("Invalid bits_per_word type, should be integer.")
-        elif not isinstance(extra_flags, int):
+        if not isinstance(extra_flags, int):
             raise TypeError("Invalid extra_flags type, should be integer.")
 
         if mode not in [0, 1, 2, 3]:
             raise ValueError("Invalid mode, can be 0, 1, 2, 3.")
-        elif bit_order.lower() not in ["msb", "lsb"]:
+        if bit_order.lower() not in ["msb", "lsb"]:
             raise ValueError("Invalid bit_order, can be \"msb\" or \"lsb\".")
-        elif bits_per_word < 0 or bits_per_word > 255:
+        if bits_per_word < 0 or bits_per_word > 255:
             raise ValueError("Invalid bits_per_word, must be 0-255.")
-        elif extra_flags < 0 or extra_flags > 255:
+        if extra_flags < 0 or extra_flags > 255:
             raise ValueError("Invalid extra_flags, must be 0-255.")
 
         # Open spidev
@@ -189,12 +190,11 @@ class SPI(object):
         # Return shifted out data with the same type as shifted in data
         if rx_buf and isinstance(rx_data, bytes):
             return bytes(bytearray(rx_buf))
-        elif rx_buf and isinstance(tx_data, bytearray):
+        if rx_buf and isinstance(tx_data, bytearray):
             return bytearray(rx_buf)
-        elif rx_buf and isinstance(tx_data, list):
+        if rx_buf and isinstance(tx_data, list):
             return rx_buf.tolist()
-        else:
-            return tx_data or [0]
+        return tx_data or [0]
 
     def close(self):
         """Close the spidev SPI device.
@@ -324,7 +324,7 @@ class SPI(object):
     def _set_bit_order(self, bit_order):
         if not isinstance(bit_order, str):
             raise TypeError("Invalid bit_order type, should be string.")
-        elif bit_order.lower() not in ["msb", "lsb"]:
+        if bit_order.lower() not in ["msb", "lsb"]:
             raise ValueError("Invalid bit_order, can be \"msb\" or \"lsb\".")
 
         # Read-modify-write mode, because the mode contains bits for other settings

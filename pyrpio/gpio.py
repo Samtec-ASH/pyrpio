@@ -1,3 +1,4 @@
+''' General-purpose input/output GPIO interface. '''
 import collections
 import ctypes
 import errno
@@ -10,10 +11,10 @@ import time
 
 class GPIOError(IOError):
     """Base class for GPIO errors."""
-    pass
 
 
 class EdgeEvent(collections.namedtuple('EdgeEvent', ['edge', 'timestamp'])):
+    ''' GPIO edge event. '''
     def __new__(cls, edge, timestamp):
         """EdgeEvent containing the event edge and event time reported by Linux.
         Args:
@@ -23,12 +24,12 @@ class EdgeEvent(collections.namedtuple('EdgeEvent', ['edge', 'timestamp'])):
         return super(EdgeEvent, cls).__new__(cls, edge, timestamp)
 
 
-class GPIO(object):
+class GPIO:
+    ''' GPIO class interface. '''
     def __new__(cls, *args):
         if len(args) > 2:
             return CdevGPIO.__new__(cls, *args)
-        else:
-            return SysfsGPIO.__new__(cls, *args)
+        return SysfsGPIO.__new__(cls, *args)
 
     def __del__(self):
         self.close()
@@ -200,6 +201,7 @@ class GPIO(object):
 
 
 class _CGpiochipInfo(ctypes.Structure):
+    # pylint: disable=too-few-public-methods
     _fields_ = [
         ('name', ctypes.c_char * 32),
         ('label', ctypes.c_char * 32),
@@ -208,6 +210,7 @@ class _CGpiochipInfo(ctypes.Structure):
 
 
 class _CGpiolineInfo(ctypes.Structure):
+    # pylint: disable=too-few-public-methods
     _fields_ = [
         ('line_offset', ctypes.c_uint32),
         ('flags', ctypes.c_uint32),
@@ -217,6 +220,7 @@ class _CGpiolineInfo(ctypes.Structure):
 
 
 class _CGpiohandleRequest(ctypes.Structure):
+    # pylint: disable=too-few-public-methods
     _fields_ = [
         ('lineoffsets', ctypes.c_uint32 * 64),
         ('flags', ctypes.c_uint32),
@@ -228,12 +232,14 @@ class _CGpiohandleRequest(ctypes.Structure):
 
 
 class _CGpiohandleData(ctypes.Structure):
+    # pylint: disable=too-few-public-methods
     _fields_ = [
         ('values', ctypes.c_uint8 * 64),
     ]
 
 
 class _CGpioeventRequest(ctypes.Structure):
+    # pylint: disable=too-few-public-methods
     _fields_ = [
         ('lineoffset', ctypes.c_uint32),
         ('handleflags', ctypes.c_uint32),
@@ -244,6 +250,7 @@ class _CGpioeventRequest(ctypes.Structure):
 
 
 class _CGpioeventData(ctypes.Structure):
+    # pylint: disable=too-few-public-methods
     _fields_ = [
         ('timestamp', ctypes.c_uint64),
         ('id', ctypes.c_uint32),
@@ -251,6 +258,7 @@ class _CGpioeventData(ctypes.Structure):
 
 
 class CdevGPIO(GPIO):
+    ''' Cdev GPIO. '''
     # Constants scraped from <linux/gpio.h>
     _GPIOHANDLE_GET_LINE_VALUES_IOCTL = 0xc040b408
     _GPIOHANDLE_SET_LINE_VALUES_IOCTL = 0xc040b409
@@ -296,7 +304,8 @@ class CdevGPIO(GPIO):
 
         self._open(path, line, direction)
 
-    def __new__(self, path, line, direction):
+    # pylint: disable=unused-argument,arguments-differ
+    def __new__(cls, path, line, direction):
         return object.__new__(CdevGPIO)
 
     def _open(self, path, line, direction):
@@ -354,7 +363,9 @@ class CdevGPIO(GPIO):
 
                 request.lineoffset = self._line
                 request.handleflags = CdevGPIO._GPIOHANDLE_REQUEST_INPUT
-                request.eventflags = CdevGPIO._GPIOEVENT_REQUEST_RISING_EDGE if edge == "rising" else CdevGPIO._GPIOEVENT_REQUEST_FALLING_EDGE if edge == "falling" else CdevGPIO._GPIOEVENT_REQUEST_BOTH_EDGES
+                request.eventflags = CdevGPIO._GPIOEVENT_REQUEST_RISING_EDGE if edge == "rising" \
+                    else CdevGPIO._GPIOEVENT_REQUEST_FALLING_EDGE if edge == "falling" \
+                    else CdevGPIO._GPIOEVENT_REQUEST_BOTH_EDGES
                 request.consumer_label = b"periphery"
 
                 try:
@@ -367,7 +378,7 @@ class CdevGPIO(GPIO):
                 self._edge = edge
         else:
             request = _CGpiohandleRequest()
-            initial_value = True if direction == "high" else False
+            initial_value = direction == "high"
 
             request.lineoffsets[0] = self._line
             request.flags = CdevGPIO._GPIOHANDLE_REQUEST_OUTPUT
@@ -606,11 +617,13 @@ class CdevGPIO(GPIO):
         except GPIOError:
             str_chip_label = "<error>"
 
+        # pylint: disable=line-too-long
         return "GPIO {:d} (name=\"{:s}\", device={:s}, line_fd={:d}, chip_fd={:d}, direction={:s}, edge={:s}, chip_name=\"{:s}\", chip_label=\"{:s}\", type=cdev)" \
             .format(self._line, str_name, self._devpath, self._line_fd, self._chip_fd, str_direction, str_edge, str_chip_name, str_chip_label)
 
 
 class SysfsGPIO(GPIO):
+    ''' Older/slower sysfs based GPIO access. '''
     # Number of retries to check for GPIO export or direction write on open
     GPIO_OPEN_RETRIES = 10
     # Delay between check for GPIO export or direction write on open (100ms)
@@ -640,7 +653,8 @@ class SysfsGPIO(GPIO):
 
         self._open(line, direction)
 
-    def __new__(self, line, direction):
+    # pylint: disable=arguments-differ,unused-argument
+    def __new__(cls, line, direction):
         return object.__new__(SysfsGPIO)
 
     def _open(self, line, direction):
@@ -719,7 +733,7 @@ class SysfsGPIO(GPIO):
 
         if buf[0] == b"0"[0]:
             return False
-        elif buf[0] == b"1"[0]:
+        if buf[0] == b"1"[0]:
             return True
 
         raise GPIOError(None, "Unknown GPIO value: {}".format(buf))

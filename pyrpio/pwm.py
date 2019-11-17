@@ -9,10 +9,10 @@ import time
 
 class PWMError(IOError):
     """Base class for PWM errors."""
-    pass
 
 
-class PWM(object):
+class PWM:
+    ''' PWM class interface. '''
     # Number of retries to check for successful PWM export on open
     PWM_STAT_RETRIES = 10
     # Delay between check for scucessful PWM export on open (100ms)
@@ -234,7 +234,7 @@ class PWM(object):
     def _set_duty_cycle(self, duty_cycle):
         if not isinstance(duty_cycle, (int, float)):
             raise TypeError("Invalid duty cycle type, should be int or float.")
-        elif not 0.0 <= duty_cycle <= 1.0:
+        if not 0.0 <= duty_cycle <= 1.0:
             raise ValueError("Invalid duty cycle value, should be between 0.0 and 1.0.")
 
         # Convert duty cycle from ratio to nanoseconds
@@ -272,7 +272,7 @@ class PWM(object):
     def _set_polarity(self, polarity):
         if not isinstance(polarity, str):
             raise TypeError("Invalid polarity type, should be str.")
-        elif polarity.lower() not in ["normal", "inversed"]:
+        if polarity.lower() not in ["normal", "inversed"]:
             raise ValueError("Invalid polarity, can be: \"normal\" or \"inversed\".")
 
         self._write_channel_attr("polarity", polarity.lower())
@@ -291,7 +291,7 @@ class PWM(object):
 
         if enabled == "1":
             return True
-        elif enabled == "0":
+        if enabled == "0":
             return False
 
         raise PWMError(None, "Unknown enabled value: \"{:s}\"".format(enabled))

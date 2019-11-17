@@ -1,3 +1,4 @@
+''' Handles detecting pin mapping of given board. '''
 import re
 from typing import Optional
 from pyrpio.defs import PinMapName, RPIOConfigs, RPIOBoard, RPIOMapping, PIN_MAPPINGS
@@ -13,16 +14,16 @@ def detect_pinmap_name_dt() -> Optional[PinMapName]:
     try:
         with open('/proc/device-tree/model', 'r') as fp:
             model = fp.read()
-    except Exception as err:
+    except Exception:
         return None
     if not model:
         return None
     pattern = re.compile(r'^Raspberry Pi (.*) Model')
     board_rev = None
     for line in model.split('\n'):
-        m = pattern.search(line)
-        if m:
-            board_rev = next((int(s) for s in m.group(0).split() if s.isdigit()), None)
+        found = pattern.search(line)
+        if found:
+            board_rev = next((int(s) for s in found.group(0).split() if s.isdigit()), None)
             break
     if board_rev in [2, 3, 4]:
         return PinMapName.PINMAP_40
@@ -39,16 +40,16 @@ def detect_pinmap_name() -> Optional[PinMapName]:
     try:
         with open('/proc/cpuinfo', 'r') as fp:
             cpu_info = fp.read()
-    except Exception as err:
+    except Exception:
         return None
     if not cpu_info:
         return None
     pattern = re.compile(r'^Revision.*(.{4})')
     board_rev = None
     for line in cpu_info.split('\n'):
-        m = pattern.search(line)
-        if m:
-            board_rev = next((int(s, base=16) for s in m.group(0).split() if s.replace('0x', '').isdigit()), None)
+        found = pattern.search(line)
+        if found:
+            board_rev = next((int(s, base=16) for s in found.group(0).split() if s.replace('0x', '').isdigit()), None)
             break
     if board_rev in [0x2, 0x3]:
         return PinMapName.PINMAP_26_R1
