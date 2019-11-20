@@ -3,7 +3,7 @@
 from pyrpio import rpiolib
 from pyrpio.defs import RPIOConfigs
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 RPIO_INITIALIZED = False
 
