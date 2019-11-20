@@ -19,11 +19,11 @@ class MDIO:
 
     def open(self):
         ''' Open mdio bus. '''
-        rpiolib.mdio_open(self.clk_pin, self.data_pin)
+        return rpiolib.mdio_open(self.clk_pin, self.data_pin)
 
     def close(self):
         ''' Close mdio bus. '''
-        rpiolib.mdio_close(self.clk_pin, self.data_pin)
+        return rpiolib.mdio_close(self.clk_pin, self.data_pin)
 
     def read_c22_register(self, pad: int, reg: int):
         ''' Read reg in CLAUSE22. [01|01|5-bit pad|5-bit reg|XX|16-bit val]
@@ -70,7 +70,7 @@ class MDIO:
                 reg (int): 5-bit register address
                 val (int): 16-bit register value
         '''
-        rpiolib.mdio_c22_write(self.clk_pin, self.data_pin, pad, reg, val)
+        return rpiolib.mdio_c22_write(self.clk_pin, self.data_pin, pad, reg, val)
 
     def write_c45_register(self, pad: int, dad: int, reg: int, val: int):
         ''' Write reg in CLAUSE45.
@@ -82,7 +82,7 @@ class MDIO:
                 reg (int): 16-bit register address
                 val (int): 16-bit register value
         '''
-        rpiolib.mdio_c45_write(self.clk_pin, self.data_pin, pad, dad, reg, val)
+        return rpiolib.mdio_c45_write(self.clk_pin, self.data_pin, pad, dad, reg, val)
 
     def write_c45_dword_register(self, pad: int, dad: int, reg: int, val: int):
         ''' Write 32-bit reg in CLAUSE45.
@@ -96,7 +96,7 @@ class MDIO:
                 reg (int): 32-bit register address
                 val (int): 32-bit register value
         '''
-        rpiolib.mdio_c45_write(self.clk_pin, self.data_pin, pad, dad, reg, val)
+        return rpiolib.mdio_c45_write_dword(self.clk_pin, self.data_pin, pad, dad, reg, val)
 
     def read_c22_registers(self, pad: int, regs: List[int]):
         ''' Read multiple registers in CLAUSE22.

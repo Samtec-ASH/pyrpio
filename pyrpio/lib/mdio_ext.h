@@ -17,23 +17,25 @@ static PyObject *py_mdio_init(PyObject *self, PyObject *args)
 static PyObject *py_mdio_open(PyObject *self, PyObject *args)
 {
   uint8_t clk_pin, data_pin;
+  int rst;
   if (!PyArg_ParseTuple(args, "BB", &clk_pin, &data_pin))
   {
     return NULL;
   }
-  mdio_open(clk_pin, data_pin);
-  Py_RETURN_NONE;
+  rst = mdio_open(clk_pin, data_pin);
+  return Py_BuildValue("i", rst);
 }
 
 static PyObject *py_mdio_close(PyObject *self, PyObject *args)
 {
   uint8_t clk_pin, data_pin;
+  int rst;
   if (!PyArg_ParseTuple(args, "BB", &clk_pin, &data_pin))
   {
     return NULL;
   }
-  mdio_close(clk_pin, data_pin);
-  Py_RETURN_NONE;
+  rst = mdio_close(clk_pin, data_pin);
+  return Py_BuildValue("i", rst);
 }
 
 static PyObject *py_mdio_c22_read(PyObject *self, PyObject *args)

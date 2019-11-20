@@ -13,3 +13,7 @@ good-names=st,op,fp,t,e,i,j,fd,p
 max-attributes=15
 max-args=10
 max-branches=15
+
+[TYPECHECK]
+
+ignored-modules = pyrpio.rpiolib

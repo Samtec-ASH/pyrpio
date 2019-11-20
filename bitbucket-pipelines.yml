@@ -18,7 +18,9 @@ pipelines:
           - pip
         script:
           - pip install pylint pytest
+          - python setup.py install
           - pylint pyrpio
+          - pytest
     - step:
         name: Deploy to staging
         deployment: staging
