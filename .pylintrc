@@ -16,4 +16,4 @@ max-branches=15
 
 [TYPECHECK]
 
-ignored-modules = pyrpio.rpiolib
+ignored-modules = pyrpio.rpiolib,pyrpio
