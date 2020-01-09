@@ -11,7 +11,7 @@ except ImportError:
         return 0
 from pyrpio.defs import RPIOConfigs
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 
 RPIO_INITIALIZED = False
 
