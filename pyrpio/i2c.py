@@ -110,3 +110,24 @@ class I2C:
             raise I2CException(f'Bus: {self.path} is not open')
         self._bus.write(data)
         return self._bus.read(length)
+
+    def detect(self, first: int = 0x03, last: int = 0x77):
+        '''
+        Scans bus looking for devices.
+
+        Args:
+            first (int, optional): first address (inclusive). Defaults to 0x03
+            last  (int, optional): last address (inclusive). Defaults to 0x77
+
+        Returns:
+            List[int]: List of device base-10 addresses that responded.
+        '''
+        addresses = []
+        for i in range(first, last+1):
+            try:
+                self.set_address(i)
+                self.read(0x00)
+                addresses.append(i)
+            except Exception:
+                pass
+        return addresses
