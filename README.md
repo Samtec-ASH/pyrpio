@@ -1,38 +1,39 @@
 # PyRPIO
 
-⚠️ **WARNING: This is a very early pre-release. Expect things to break.** ⚠️
+![./icon.png](./icon.png)
 
 #### A Python 3 addon which provides high-speed access to the Raspberry Pi GPIO interface, supporting regular GPIO as well as i²c, PWM, and SPI.
+
 #### This package is inspired by [node-rpio](https://github.com/jperkin/node-rpio) which is a node.js addon.
 
 ![PyPI](https://img.shields.io/pypi/v/pyrpio)
 
 # Compatibility
-* Raspberry Pi Models: A, B (revisions 1.0 and 2.0), A+, B+, 2, 3, 3+, 3 A+, 4, Compute Module 3, Zero.
-* Python 3.7+
+
+- Raspberry Pi Models: A, B (revisions 1.0 and 2.0), A+, B+, 2, 3, 3+, 3 A+, 4, Compute Module 3, Zero.
+- Python 3.7+
 
 # Install
 
 Install the latest from PyPi:
 
-> ```pip install pyrpio```
+> `pip install pyrpio`
 
-_-OR-_ using __pipenv__:
+_-OR-_ using **pipenv**:
 
-> ```pipenv install pyrpio```
+> `pipenv install pyrpio`
 
 Install from source:
 
-> ```python3 setup.py install```
-
+> `python3 setup.py install`
 
 # Supported Interfaces
 
-* GPIO
-* PWM
-* I2C
-* MDIO
-* SPI
+- GPIO
+- PWM
+- I2C
+- MDIO
+- SPI
 
 # Examples
 
@@ -96,12 +97,12 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 # TODO
 
-* Expose all major, high-level C routines in bcm2835
-* Create convenience Python class for each interface: I2C, SPI, MDIO, PWM, GPIO
-* Enable specifying I2C bus:
+- Expose all major, high-level C routines in bcm2835
+- Create convenience Python class for each interface: I2C, SPI, MDIO, PWM, GPIO
+- Enable specifying I2C bus:
   - RPI 4 has 6 I2C buses
   - For older RPIs, later Raspbian images enable kernel-level bit-bang i2c.
-* Make thread safe and support locking mechanism
-* Make mock version to allow testing/developing on non-RPI (MacOS, x86 Linux)
-*
-* Testing...
+- Make thread safe and support locking mechanism
+- Make mock version to allow testing/developing on non-RPI (MacOS, x86 Linux)
+-
+- Testing...
