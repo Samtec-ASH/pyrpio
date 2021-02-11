@@ -2,7 +2,7 @@
 
 ![./icon.png](./icon.png)
 
-A Python 3 addon which provides high-speed access to the Raspberry Pi GPIO interface, supporting regular GPIO as well as i²c, PWM, and SPI.
+A Python 3 addon which provides high-speed access to the Raspberry Pi GPIO interface, supporting regular GPIO as well as i²c, PWM, SPI, and MDIO.
 
 This package is inspired by [node-rpio](https://github.com/jperkin/node-rpio) which is a node.js addon.
 
@@ -19,14 +19,6 @@ Install the latest from PyPi:
 
 > `pip install pyrpio`
 
-_-OR-_ using **pipenv**:
-
-> `pipenv install pyrpio`
-
-Install from source:
-
-> `python3 setup.py install`
-
 ## Supported Interfaces
 
 - GPIO
@@ -38,9 +30,7 @@ Install from source:
 ## Examples
 
 ```python
-import pyrpio
 from pyrpio import i2c, mdio
-
 
 ### I2C Operations ###
 
@@ -68,7 +58,7 @@ i2c_bus.close()
 ### MDIO Operations ###
 
 # Create bus using GPIO pins 23 and 24 (bit-bang)
-mdio_bus = mdio.MDIO(23, 24)
+mdio_bus = mdio.MDIO(clk_pin=23, data_pin=24, path='/dev/gpiochip0')
 mdio_bus.open()
 
 # Read register 0x10 from device 0x30 (CLAUSE-45)
