@@ -1,22 +1,73 @@
-'''
-Create a controller to perform operations on an I2C bus
-'''
+""" I2C Interface """
 from fcntl import ioctl
-from typing import Optional, IO
+import ctypes
+from typing import Optional, IO, List
 
-
-class I2CException(Exception):
+class I2CError(IOError):
     '''
     Exceptions that occur during i2c operations. (before OS level ops)
     '''
     ...
 
 
+# pylint: disable=too-few-public-methods
+class I2CMessage:
+    ''' I2C message for transfer operation. '''
+    def __init__(self, data, read=False, flags=0):
+        """Instantiate an I2C Message object.
+        Args:
+            data (bytes, bytearray, list): a byte array or list of 8-bit
+                        integers to write.
+            read (bool): specify this as a read message, where `data`
+                        serves as placeholder bytes for the read.
+            flags (int): additional i2c-dev flags for this message.
+        Returns:
+            Message: Message object.
+        Raises:
+            TypeError: if `data`, `read`, or `flags` types are invalid.
+        """
+        if not isinstance(data, (bytes, bytearray, list)):
+            raise TypeError("Invalid data type, should be bytes, bytearray, or list.")
+        if not isinstance(read, bool):
+            raise TypeError("Invalid read type, should be boolean.")
+        if not isinstance(flags, int):
+            raise TypeError("Invalid flags type, should be integer.")
+
+        self.data = data
+        self.read = read
+        self.flags = flags
+
+class _CI2CMessage(ctypes.Structure):
+    _fields_ = [
+        ("addr", ctypes.c_ushort),
+        ("flags", ctypes.c_ushort),
+        ("len", ctypes.c_ushort),
+        ("buf", ctypes.POINTER(ctypes.c_ubyte)),
+    ]
+
+class _CI2CIocTransfer(ctypes.Structure):
+    _fields_ = [
+        ("msgs", ctypes.POINTER(_CI2CMessage)),
+        ("nmsgs", ctypes.c_uint),
+    ]
+
 class I2C:
     '''
     Controller to handle an I2C bus
     '''
     I2C_SLAVE = 0x0703
+    # Constants scraped from <linux/i2c-dev.h> and <linux/i2c.h>
+    _I2C_IOC_FUNCS = 0x705
+    _I2C_IOC_RDWR = 0x707
+    _I2C_FUNC_I2C = 0x1
+    _I2C_M_TEN = 0x0010
+    _I2C_M_RD = 0x0001
+    _I2C_M_STOP = 0x8000
+    _I2C_M_NOSTART = 0x4000
+    _I2C_M_REV_DIR_ADDR = 0x2000
+    _I2C_M_IGNORE_NAK = 0x1000
+    _I2C_M_NO_RD_ACK = 0x0800
+    _I2C_M_RECV_LEN = 0x0400
 
     def __init__(self, path: str = '/dev/i2c-1'):
         '''
@@ -53,10 +104,10 @@ class I2C:
             address (int): address of i2c device
 
         Raises:
-            I2CException: Bus is not open
+            I2CError: Bus is not open
         '''
         if self._bus is None:
-            raise I2CException(f'Bus: {self.path} is not open')
+            raise I2CError(f'Bus: {self.path} is not open')
         if address != self._address:
             ioctl(self._bus.fileno(), I2C.I2C_SLAVE, address & 0x7F)
             self._address = address
@@ -69,13 +120,13 @@ class I2C:
             length (int, optional): Number of bytes to read. Defaults to 1.
 
         Raises:
-            I2CException: Bus is not open
+            I2CError: Bus is not open
 
         Returns:
             bytes: read from i2c bus
         '''
         if self._bus is None:
-            raise I2CException(f'Bus: {self.path} is not open')
+            raise I2CError(f'Bus: {self.path} is not open')
         return self._bus.read(length)
 
     def write(self, data: bytes):
@@ -86,10 +137,10 @@ class I2C:
             data (bytes): bytes written on the bus
 
         Raises:
-            I2CException: Bus is not open
+            I2CError: Bus is not open
         '''
         if self._bus is None:
-            raise I2CException(f'Bus: {self.path} is not open')
+            raise I2CError(f'Bus: {self.path} is not open')
         self._bus.write(data)
 
     def read_write(self, data: bytes, length: int = 1) -> bytes:
@@ -101,23 +152,82 @@ class I2C:
             length (int, optional): number of bytes to read back. Defaults to 1.
 
         Raises:
-            I2CException: Bus is not open
+            I2CError: Bus is not open
 
         Returns:
             bytes: infromation read back from device on bus
         '''
         if self._bus is None:
-            raise I2CException(f'Bus: {self.path} is not open')
+            raise I2CError(f'Bus: {self.path} is not open')
         self._bus.write(data)
         return self._bus.read(length)
 
-    def detect(self, first: int = 0x03, last: int = 0x77):
+    def transfer(self, address: int, messages: List[I2CMessage]):
+        """Transfer `messages` to the specified I2C `address`. Modifies the
+        `messages` array with the results of any read transactions.
+        Args:
+            address (int): I2C address.
+            messages (list): list of I2C.Message messages.
+        Raises:
+            I2CError: if an I/O or OS error occurs.
+            TypeError: if `messages` type is not list.
+            ValueError: if `messages` length is zero, or if message data is not valid bytes.
+        """
+        if not isinstance(messages, list):
+            raise TypeError("Invalid messages type, should be list of I2C.Message.")
+        if len(messages) == 0:
+            raise ValueError("Invalid messages data, should be non-zero length.")
+
+        # Convert I2C.Message messages to _CI2CMessage messages
+        cmessages = (_CI2CMessage * len(messages))()
+        for i, message in enumerate(messages):
+            # Convert I2C.Message data to bytes
+            if isinstance(message.data, bytes):
+                data = message.data
+            elif isinstance(message.data, bytearray):
+                data = bytes(message.data)
+            elif isinstance(message.data, list):
+                data = bytes(bytearray(messages[i].data))
+            else:
+                raise ValueError('Invalid data type')
+
+            cmessages[i].addr = address
+            cmessages[i].flags = message.flags | (I2C._I2C_M_RD if message.read else 0)
+            cmessages[i].len = len(data)
+            cmessages[i].buf = ctypes.cast(ctypes.create_string_buffer(data, len(data)), ctypes.POINTER(ctypes.c_ubyte))
+
+        # Prepare transfer structure
+        i2c_xfer = _CI2CIocTransfer()
+        i2c_xfer.nmsgs = len(cmessages)
+        i2c_xfer.msgs = cmessages
+
+        # Transfer
+        try:
+            ioctl(self._bus, I2C._I2C_IOC_RDWR, i2c_xfer, False)
+        except (OSError, IOError) as e:
+            raise I2CError(e.errno, "I2C transfer: " + e.strerror) from e
+
+        # Update any read I2C.Message messages
+        for i, message in enumerate(messages):
+            if message.read:
+                data = [cmessages[i].buf[j] for j in range(cmessages[i].len)]
+                # Convert read data to type used in I2C.Message messages
+                if isinstance(messages[i].data, list):
+                    message.data = data
+                elif isinstance(messages[i].data, bytearray):
+                    message.data = bytearray(data)
+                elif isinstance(messages[i].data, bytes):
+                    message.data = bytes(bytearray(data))
+
+    def detect(self, first: int = 0x03, last: int = 0x77, data: Optional[bytes] = None, length: int = 1):
         '''
         Scans bus looking for devices.
 
         Args:
             first (int, optional): first address (inclusive). Defaults to 0x03
             last  (int, optional): last address (inclusive). Defaults to 0x77
+            data (bytes, optional): Attempt to write given data. Defaults to None
+            length (int, optional): Number of bytes to read. Defaults to 1
 
         Returns:
             List[int]: List of device base-10 addresses that responded.
@@ -126,7 +236,10 @@ class I2C:
         for i in range(first, last+1):
             try:
                 self.set_address(i)
-                self.read(0x00)
+                if data is not None:
+                    self.read_write(data=data, length=length)
+                else:
+                    self.read(length=length)
                 addresses.append(i)
             except Exception:
                 pass

@@ -7,29 +7,35 @@ pipelines:
         max-time: 10
         caches:
           - pip
+          - poetry
         script:
-          - pip install pylint pytest
-          - pylint pyrpio
+          - pip install poetry
+          - poetry install
+          - poetry run pytest tests/
+          - poetry run pylint --rcfile .pylintrc pyrpio
     - step:
         name: Deploy to test
         deployment: test
         max-time: 10
         caches:
           - pip
+          - poetry
         script:
-          - pip install pylint pytest
-          - python setup.py install
-          - pylint pyrpio
-          - pytest
+          - pip install poetry
+          - poetry install
+          - poetry run pytest tests/
+          - poetry run pylint --rcfile .pylintrc pyrpio
     - step:
         name: Deploy to staging
         deployment: staging
         max-time: 10
         caches:
           - pip
+          - poetry
         script:
-          - pip install twine wheel
-          - python setup.py sdist
+          - pip install poetry
+          - poetry build
+          - poetry publish -u $PYPI_USERNAME -p $PYPI_PASSWORD --dry-run
     - step:
         name: Deploy to production
         deployment: production
@@ -38,6 +44,10 @@ pipelines:
           - pip
         trigger: manual
         script:
-          - pip install twine wheel
-          - python setup.py sdist
-          - twine upload -u $PYPI_USERNAME -p $PYPI_PASSWORD --skip-existing dist/*
+          - pip install poetry
+          - poetry build
+          - poetry publish -u $PYPI_USERNAME -p $PYPI_PASSWORD
+
+definitions:
+  caches:
+    poetry: .venv

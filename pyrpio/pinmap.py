@@ -1,7 +1,7 @@
 ''' Handles detecting pin mapping of given board. '''
 import re
 from typing import Optional
-from pyrpio.defs import PinMapName, RPIOConfigs, RPIOBoard, RPIOMapping, PIN_MAPPINGS
+from pyrpio.types import PinMapName, RPIOConfigs, RPIOBoard, RPIOMapping, PIN_MAPPINGS
 
 
 def detect_pinmap_name_dt() -> Optional[PinMapName]:
