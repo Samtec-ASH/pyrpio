@@ -1,29 +1,118 @@
 """ Handle MDIO interface via bitbang and SPI bus. """
 from typing import List, Optional
+from pyrpio.gpio import CdevGPIO
 from pyrpio.spi import SPI
-from pyrpio import rpiolib
-
 
 class MDIO:
     ''' Bit-bang MDIO interface. '''
+    C22_FRAME = 0x01
+    C45_FRAME = 0x00
+    OP_C22_WR = 0x01
+    OP_C22_RD = 0x02
+    OP_C45_AD = 0x00
+    OP_C45_WR = 0x01
+    OP_C45_RD_INC = 0x02
+    OP_C45_RD = 0x03
 
-    def __init__(self, clk_pin: int, data_pin: int):
+    def __init__(self, clk_pin: int, data_pin: int, path: str, **kwargs):
         '''
-        Bit-bang MDIO interface.
+        Bit-bang MDIO interface via cdev gpio.
         Args:
             clk_pin (int): GPIO pin of clock
             data_pin (int): GPIO pin of data
         '''
         self.clk_pin = clk_pin
         self.data_pin = data_pin
+        self.clk_gpio = CdevGPIO(path=path, line=clk_pin, direction="low")
+        self.data_gpio = CdevGPIO(path=path, line=data_pin, direction="high", bias="pull_up")
+        self._clock_delay = kwargs.get('clock_delay', 50)
+        self._setup_delay = kwargs.get('setup_delay', 10)
+        self._read_delay = kwargs.get('read_delay', 1000)
 
     def open(self):
         ''' Open mdio bus. '''
-        return rpiolib.mdio_open(self.clk_pin, self.data_pin)
 
     def close(self):
         ''' Close mdio bus. '''
-        return rpiolib.mdio_close(self.clk_pin, self.data_pin)
+        self.clk_gpio.close()
+        self.data_gpio.close()
+
+    def _ndelay(self, delay):  # pylint: disable=no-self-use
+        while delay > 0:
+            delay -= 1
+
+    def _write_bit(self, val: int):
+        self._ndelay(self._clock_delay)
+        self.data_gpio.write(bool(val))
+        self._ndelay(self._setup_delay)
+        self.clk_gpio.write(True)
+        self._ndelay(self._clock_delay)
+        self.clk_gpio.write(False)
+
+    def _read_bit(self) -> int:
+        self._ndelay(self._clock_delay)
+        v = int(self.data_gpio.read())
+        self._ndelay(self._setup_delay)
+        self.clk_gpio.write(True)
+        self._ndelay(self._clock_delay)
+        self.clk_gpio.write(False)
+        return v
+
+    def _write_bits(self, val, bits):
+        for i in range(bits - 1, -1, -1):
+            self._write_bit((val >> i) & 1)
+
+    def _read_bits(self, bits) -> int:
+        ret = 0
+        for _ in range(bits - 1, -1, -1):
+            ret <<= 1
+            ret |= self._read_bit()
+        return ret
+
+    def _flush(self):
+        for _ in range(32):
+            self._write_bit(1)
+
+    def _cmd(self, sf, op, pad, dad):
+        # Preamble
+        self._flush()
+        # Header
+        self._write_bits(sf & 3, 2)  # Start frame
+        self._write_bits(op & 3, 2)  # OP Code
+        self._write_bits(pad, 5)  # Phy addr
+        self._write_bits(dad, 5)  # Reg addr(C22) / dev type(C45)
+
+    def _c45_write_addr(self, pad: int, dad: int, reg: int):
+        # Send preamble/header - C45 - ADDR
+        self._cmd(MDIO.C45_FRAME, MDIO.OP_C45_AD, pad, dad)
+        # Send the turnaround(10)
+        self._write_bits(2, 2)
+        # Send 16-bit value
+        self._write_bits(reg, 16)
+        return 0
+
+    def _c45_write_val(self, pad: int, dad: int, val: int):
+        # Send preamble/header - C45 - WRITE
+        self._cmd(MDIO.C45_FRAME, MDIO.OP_C45_WR, pad, dad)
+        # Send the turnaround(10)
+        self._write_bits(2, 2)
+        # Send 16-bit value
+        self._write_bits(val, 16)
+        return 0
+
+    def _c45_read_val(self, pad: int, dad: int) -> int:
+        # Send preamble/header
+        self._cmd(MDIO.C45_FRAME, MDIO.OP_C45_RD, pad, dad)
+        # Release data pin
+        self.data_gpio.direction = "in"
+        self._ndelay(self._read_delay)
+        # Read 2-bit turnaround(gives slave time)
+        self._read_bits(2)
+        # Read 16-bit value
+        ret = self._read_bits(16)
+        # Capture data pin
+        self.data_gpio.direction = "high"
+        return ret
 
     def read_c22_register(self, pad: int, reg: int):
         ''' Read reg in CLAUSE22. [01|01|5-bit pad|5-bit reg|XX|16-bit val]
@@ -33,7 +122,19 @@ class MDIO:
             Returns:
                 int: 16-bit register value
         '''
-        return rpiolib.mdio_c22_read(self.clk_pin, self.data_pin, pad, reg)
+        # Send preamble/header
+        self._cmd(MDIO.C22_FRAME, MDIO.OP_C22_RD, pad, reg)
+        # Release data pin
+        self.data_gpio.direction = "in"
+        self._ndelay(self._read_delay)
+        # Read 2-bit turnaround (gives slave time)
+        self._read_bits(2)
+        # Read 16-bit value
+        ret = self._read_bits(16)
+        # Capture data pin
+        self.data_gpio.direction = "high"
+        self._flush()
+        return ret
 
     def read_c45_register(self, pad: int, dad: int, reg: int):
         ''' Read reg in CLAUSE45.
@@ -46,7 +147,10 @@ class MDIO:
             Returns:
                 int: 16-bit register value
         '''
-        return rpiolib.mdio_c45_read(self.clk_pin, self.data_pin, pad, dad, reg)
+        self._c45_write_addr(pad, dad, reg)
+        val = self._c45_read_val(pad, dad)
+        self._flush()
+        return val
 
     def read_c45_dword_register(self, pad: int, dad: int, reg: int):
         ''' Read 32-bit reg in CLAUSE45.
@@ -61,7 +165,12 @@ class MDIO:
             Returns:
                 int: 32-bit register value
         '''
-        return rpiolib.mdio_c45_read_dword(self.clk_pin, self.data_pin, pad, dad, reg)
+        self._c45_write_addr(pad, dad, reg & 0xFFFF)
+        self._c45_write_addr(pad, dad, reg >> 16)
+        val_lsb = self._c45_read_val(pad, dad)
+        val_msb = self._c45_read_val(pad, dad)
+        self._flush()
+        return (val_msb << 16) & (val_lsb & 0xFFFF)
 
     def write_c22_register(self, pad: int, reg: int, val: int):
         ''' Write reg in CLAUSE22. [01|01|5-bit pad|5-bit reg|01|16-bit val]
@@ -70,7 +179,13 @@ class MDIO:
                 reg (int): 5-bit register address
                 val (int): 16-bit register value
         '''
-        return rpiolib.mdio_c22_write(self.clk_pin, self.data_pin, pad, reg, val)
+        # Send preamble/header
+        self._cmd(MDIO.C22_FRAME, MDIO.OP_C22_WR, pad, reg)
+        # Send the turnaround (10)
+        self._write_bits(2, 2)
+        # Send 16-bit value
+        self._write_bits(val, 16)
+        self._flush()
 
     def write_c45_register(self, pad: int, dad: int, reg: int, val: int):
         ''' Write reg in CLAUSE45.
@@ -82,7 +197,10 @@ class MDIO:
                 reg (int): 16-bit register address
                 val (int): 16-bit register value
         '''
-        return rpiolib.mdio_c45_write(self.clk_pin, self.data_pin, pad, dad, reg, val)
+        self._c45_write_addr(pad, dad, reg)
+        rst = self._c45_write_val(pad, dad, val)
+        self._flush()
+        return rst
 
     def write_c45_dword_register(self, pad: int, dad: int, reg: int, val: int):
         ''' Write 32-bit reg in CLAUSE45.
@@ -96,7 +214,12 @@ class MDIO:
                 reg (int): 32-bit register address
                 val (int): 32-bit register value
         '''
-        return rpiolib.mdio_c45_write_dword(self.clk_pin, self.data_pin, pad, dad, reg, val)
+        self._c45_write_addr(pad, dad, reg & 0xFFFF)
+        self._c45_write_addr(pad, dad, reg >> 16)
+        rst = self._c45_write_val(pad, dad, val & 0xFFFF)
+        rst |= self._c45_write_val(pad, dad, val >> 16)
+        self._flush()
+        return rst
 
     def read_c22_registers(self, pad: int, regs: List[int]):
         ''' Read multiple registers in CLAUSE22.

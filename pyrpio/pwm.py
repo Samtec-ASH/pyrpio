@@ -65,7 +65,7 @@ class PWM:
                 with open(os.path.join(chip_path, "export"), "w") as f_export:
                     f_export.write("{:d}\n".format(channel))
             except IOError as e:
-                raise PWMError(e.errno, "Exporting PWM channel: " + e.strerror)
+                raise PWMError(e.errno, "Exporting PWM channel: " + e.strerror) from e
 
             # Loop until PWM is exported
             exported = False
@@ -87,7 +87,7 @@ class PWM:
                         break
                 except IOError as e:
                     if e.errno != errno.EACCES or (e.errno == errno.EACCES and i == PWM.PWM_STAT_RETRIES - 1):
-                        raise PWMError(e.errno, "Opening PWM period: " + e.strerror)
+                        raise PWMError(e.errno, "Opening PWM period: " + e.strerror) from e
 
                 time.sleep(PWM.PWM_STAT_DELAY)
 
@@ -108,7 +108,7 @@ class PWM:
                 os.write(unexport_fd, "{:d}\n".format(self._channel).encode())
                 os.close(unexport_fd)
             except OSError as e:
-                raise PWMError(e.errno, "Unexporting PWM: " + e.strerror)
+                raise PWMError(e.errno, "Unexporting PWM: " + e.strerror) from e
 
         self._chip = None
         self._channel = None
@@ -161,8 +161,8 @@ class PWM:
 
         try:
             period_ns = int(period_ns_str)
-        except ValueError:
-            raise PWMError(None, "Unknown period value: \"{:s}\"".format(period_ns_str))
+        except ValueError as err:
+            raise PWMError(None, "Unknown period value: \"{:s}\"".format(period_ns_str)) from err
 
         # Update our cached period
         self._period_ns = period_ns
@@ -191,8 +191,8 @@ class PWM:
 
         try:
             duty_cycle_ns = int(duty_cycle_ns_str)
-        except ValueError:
-            raise PWMError(None, "Unknown duty cycle value: \"{:s}\"".format(duty_cycle_ns_str))
+        except ValueError as e:
+            raise PWMError(None, "Unknown duty cycle value: \"{:s}\"".format(duty_cycle_ns_str)) from e
 
         return duty_cycle_ns
 

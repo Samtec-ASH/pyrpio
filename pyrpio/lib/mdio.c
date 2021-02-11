@@ -218,7 +218,7 @@ int mdio_c45_write_dword(uint8_t clk_pin, uint8_t data_pin, uint8_t pad, uint8_t
   mdio_c45_write_addr(clk_pin, data_pin, pad, dad, (uint16_t)(reg & 0xFFFF));
   mdio_c45_write_addr(clk_pin, data_pin, pad, dad, (uint16_t)(reg >> 16));
   rst = mdio_c45_write_val(clk_pin, data_pin, pad, dad, (uint16_t)(val & 0xFFFF));
-  rst |= mdio_c45_write_val(clk_pin, data_pin, pad, dad, (uint16_t)(reg >> 16));
+  rst |= mdio_c45_write_val(clk_pin, data_pin, pad, dad, (uint16_t)(val >> 16));
   mdio_flush(clk_pin, data_pin);
   return rst;
 }

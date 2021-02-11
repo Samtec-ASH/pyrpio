@@ -7,7 +7,7 @@ disable=broad-except,duplicate-code,attribute-defined-outside-init
 [FORMAT]
 max-line-length=140
 
-good-names=st,op,fp,t,e,i,j,fd,p
+good-names=st,op,fp,t,e,i,j,fd,p,v,sf
 
 [DESIGN]
 max-attributes=15
@@ -16,4 +16,4 @@ max-branches=15
 
 [TYPECHECK]
 
-ignored-modules = pyrpio.rpiolib,pyrpio
+ignored-modules=pyrpio.rpiolib
