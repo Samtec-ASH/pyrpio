@@ -11,7 +11,7 @@ This package is inspired by [node-rpio](https://github.com/jperkin/node-rpio) wh
 ## Compatibility
 
 - Raspberry Pi Models: A, B (revisions 1.0 and 2.0), A+, B+, 2, 3, 3+, 3 A+, 4, Compute Module 3, Zero.
-- Python 3.6+
+- Python 3.7+
 
 ## Install
 
@@ -30,8 +30,9 @@ Install the latest from PyPi:
 ## Examples
 
 ```python
-from pyrpio import i2c, mdio
-
+from pyrpio.i2c import I2C
+from pyrpio.mdio import MDIO
+from pyrpio.i2c_register_device import I2CRegisterDevice
 ### I2C Operations ###
 
 i2c_bus = i2c.I2C('/dev/i2c-3')
@@ -39,18 +40,15 @@ i2c_bus.open()
 
 i2c_bus.set_address(0x50)
 
-# Read 8-bit value using 8-bit addressing
-val = i2c_bus.read_register(0x0)
-i2c_bus.set_address(0x21)
+i2c_bus.read_write(data=bytes([0x23]), length=1)
 
-# Read uint16_t using 8-bit addressing
-val = i2c_bus.read_register(0x0, reg_nbytes=1, val_nbytes=2)
+i2c_dev = I2CRegisterDevice(bus=i2c_bus, address=0x50, register_size=1, data_size=1)
 
-# Read int16_t using 8-bit addressing
-val = i2c_bus.read_register(0x0, reg_nbytes=1, val_nbytes=2, signed=True)
+# Read register
+val = i2c_dev.read_register(register=0x23)
 
-# Seq read 8 regs starting @ 0x0 using I2C repeat start
-regs = i2c_bus.read_register_sequential(0,8)
+# Read sequential registers
+vals = i2c_dev.read_register_sequential(register=0x23, length=4)
 
 # Close up shop
 i2c_bus.close()
