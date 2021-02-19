@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "PyRPIO"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python-wrapped RPIO"
 authors = ["Adam Page <adam.page@samtec.com>"]
 license = "MIT"
