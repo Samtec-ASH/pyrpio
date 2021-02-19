@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "PyRPIO"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python-wrapped RPIO"
 authors = ["Adam Page <adam.page@samtec.com>"]
 license = "MIT"
@@ -10,7 +10,7 @@ repository = "https://github.com/Samtec-ASH/pyrpio"
 # build = "build.py"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.1"
