@@ -2,7 +2,7 @@
 
 [MESSAGES CONTROL]
 
-disable=broad-except,duplicate-code,attribute-defined-outside-init
+disable=broad-except,duplicate-code,attribute-defined-outside-init,invalid-name,c-extension-no-member,too-few-public-methods,arguments-differ
 
 [FORMAT]
 max-line-length=140

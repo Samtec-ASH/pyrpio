@@ -1,9 +1,7 @@
-'''
-Create a generic register device that runs over I2C
-'''
+''' Create a generic register device that runs over I2C. '''
 import struct
 from typing import Collection, Tuple
-from pyrpio.i2c import I2C
+from .i2c.types import I2CBase
 
 
 class I2CRegisterDevice:
@@ -12,7 +10,7 @@ class I2CRegisterDevice:
     '''
     FORMAT_SIZE = {1: 'B', 2: 'H', 4: 'I', 8: 'Q'}
 
-    def __init__(self, bus: I2C, address: int, register_size: int = 1, data_size: int = 1):
+    def __init__(self, bus: I2CBase, address: int, register_size: int = 1, data_size: int = 1):
         '''
         [summary]
 
@@ -88,6 +86,7 @@ class I2CRegisterDevice:
         '''
         self._bus.set_address(self._address)
         data_bytes = self.read_register_sequential_bytes(register, length)
+        # pylint: disable=E1101
         return struct.unpack(f'>{length}{I2CRegisterDevice.FORMAT_SIZE[self._data_size]}', data_bytes)
 
     def read_register_sequential_bytes(self, register: int, length: int) -> bytes:
@@ -117,6 +116,7 @@ class I2CRegisterDevice:
             register (int): Start register address
             data (Collection[int]): Register values to write
         '''
+        # pylint: disable=E1101
         self.write_register_sequential_bytes(register, struct.pack(
             f'>{len(data)}{I2CRegisterDevice.FORMAT_SIZE[self._data_size]}', *data))
 

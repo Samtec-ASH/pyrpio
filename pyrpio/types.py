@@ -1,4 +1,5 @@
 ''' PyRPIO definitions: enums and dataclasses. '''
+
 from enum import Enum
 from typing import Optional, List
 from dataclasses import dataclass
