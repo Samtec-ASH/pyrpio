@@ -1,41 +1,9 @@
-""" I2C Interface """
+""" Direct HW Linux I2C Interface """
+
 from fcntl import ioctl
 import ctypes
 from typing import Optional, IO, List
-
-class I2CError(IOError):
-    '''
-    Exceptions that occur during i2c operations. (before OS level ops)
-    '''
-    ...
-
-
-# pylint: disable=too-few-public-methods
-class I2CMessage:
-    ''' I2C message for transfer operation. '''
-    def __init__(self, data, read=False, flags=0):
-        """Instantiate an I2C Message object.
-        Args:
-            data (bytes, bytearray, list): a byte array or list of 8-bit
-                        integers to write.
-            read (bool): specify this as a read message, where `data`
-                        serves as placeholder bytes for the read.
-            flags (int): additional i2c-dev flags for this message.
-        Returns:
-            Message: Message object.
-        Raises:
-            TypeError: if `data`, `read`, or `flags` types are invalid.
-        """
-        if not isinstance(data, (bytes, bytearray, list)):
-            raise TypeError("Invalid data type, should be bytes, bytearray, or list.")
-        if not isinstance(read, bool):
-            raise TypeError("Invalid read type, should be boolean.")
-        if not isinstance(flags, int):
-            raise TypeError("Invalid flags type, should be integer.")
-
-        self.data = data
-        self.read = read
-        self.flags = flags
+from .types import I2CBase, I2CError, I2CMessage
 
 class _CI2CMessage(ctypes.Structure):
     _fields_ = [
@@ -51,7 +19,7 @@ class _CI2CIocTransfer(ctypes.Structure):
         ("nmsgs", ctypes.c_uint),
     ]
 
-class I2C:
+class I2C(I2CBase):
     '''
     Controller to handle an I2C bus
     '''
@@ -219,7 +187,7 @@ class I2C:
                 elif isinstance(messages[i].data, bytes):
                     message.data = bytes(bytearray(data))
 
-    def detect(self, first: int = 0x03, last: int = 0x77, data: Optional[bytes] = None, length: int = 1):
+    def detect(self, first: int = 0x03, last: int = 0x77, data: Optional[bytes] = None, length: int = 1) -> List[int]:
         '''
         Scans bus looking for devices.
 
@@ -244,3 +212,5 @@ class I2C:
             except Exception:
                 pass
         return addresses
+
+

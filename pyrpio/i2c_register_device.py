@@ -3,7 +3,7 @@ Create a generic register device that runs over I2C
 '''
 import struct
 from typing import Collection, Tuple
-from pyrpio.i2c import I2C
+from .i2c.types import I2CBase
 
 
 class I2CRegisterDevice:
@@ -12,7 +12,7 @@ class I2CRegisterDevice:
     '''
     FORMAT_SIZE = {1: 'B', 2: 'H', 4: 'I', 8: 'Q'}
 
-    def __init__(self, bus: I2C, address: int, register_size: int = 1, data_size: int = 1):
+    def __init__(self, bus: I2CBase, address: int, register_size: int = 1, data_size: int = 1):
         '''
         [summary]
 

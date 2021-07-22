@@ -11,6 +11,7 @@ repository = "https://github.com/Samtec-ASH/pyrpio"
 
 [tool.poetry.dependencies]
 python = "^3.7"
+pyftdi = {version = "^0.53.2", optional = true, allow-prereleases = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.1"
@@ -18,6 +19,10 @@ pep8 = "^1.7.1"
 pylint = "^2.6.0"
 autopep8 = "^1.5.4"
 flake8 = "^3.8.4"
+ipython = "^7.25.0"
+
+[tool.poetry.extras]
+ftdi = ["pyftdi"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
