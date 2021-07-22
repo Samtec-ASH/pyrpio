@@ -1,7 +1,7 @@
 """ I2C vs FTDI USB-Serial Interface (FT232H) """
 
 from typing import List, Optional
-import pyftdi.i2c
+import pyftdi.i2c  # pylint: disable=import-error
 from .types import I2CBase, I2CMessage
 
 
