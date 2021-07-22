@@ -1,6 +1,4 @@
-'''
-Create a generic register device that runs over I2C
-'''
+''' Create a generic register device that runs over I2C. '''
 import struct
 from typing import Collection, Tuple
 from .i2c.types import I2CBase
@@ -88,6 +86,7 @@ class I2CRegisterDevice:
         '''
         self._bus.set_address(self._address)
         data_bytes = self.read_register_sequential_bytes(register, length)
+        # pylint: disable=E1101
         return struct.unpack(f'>{length}{I2CRegisterDevice.FORMAT_SIZE[self._data_size]}', data_bytes)
 
     def read_register_sequential_bytes(self, register: int, length: int) -> bytes:
@@ -117,6 +116,7 @@ class I2CRegisterDevice:
             register (int): Start register address
             data (Collection[int]): Register values to write
         '''
+        # pylint: disable=E1101
         self.write_register_sequential_bytes(register, struct.pack(
             f'>{len(data)}{I2CRegisterDevice.FORMAT_SIZE[self._data_size]}', *data))
 

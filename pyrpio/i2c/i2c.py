@@ -1,6 +1,6 @@
 """ Direct HW Linux I2C Interface """
 
-from fcntl import ioctl
+import fcntl
 import ctypes
 from typing import Optional, IO, List
 from .types import I2CBase, I2CError, I2CMessage
@@ -53,7 +53,7 @@ class I2C(I2CBase):
         Open the i2c bus
         '''
         if not self._bus:
-            self._bus = open(self.path, 'r+b', buffering=0)
+            self._bus = open(self.path, 'r+b', buffering=0)  # pylint: disable=consider-using-with
             self._address = 0x0
 
     def close(self):
@@ -77,7 +77,7 @@ class I2C(I2CBase):
         if self._bus is None:
             raise I2CError(f'Bus: {self.path} is not open')
         if address != self._address:
-            ioctl(self._bus.fileno(), I2C.I2C_SLAVE, address & 0x7F)
+            fcntl.ioctl(self._bus.fileno(), I2C.I2C_SLAVE, address & 0x7F)
             self._address = address
 
     def read(self, length: int = 1) -> bytes:
@@ -171,7 +171,7 @@ class I2C(I2CBase):
 
         # Transfer
         try:
-            ioctl(self._bus, I2C._I2C_IOC_RDWR, i2c_xfer, False)
+            fcntl.ioctl(self._bus, I2C._I2C_IOC_RDWR, i2c_xfer, False)
         except (OSError, IOError) as e:
             raise I2CError(e.errno, "I2C transfer: " + e.strerror) from e
 
@@ -212,5 +212,3 @@ class I2C(I2CBase):
             except Exception:
                 pass
         return addresses
-
-

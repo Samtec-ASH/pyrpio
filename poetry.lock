@@ -476,7 +476,7 @@ ftdi = ["pyftdi"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "748556762730f6b580e8340979cb01d77688467930aae3527524c44a491f14bc"
+content-hash = "375edaaddbc20f864438f22f8816020751a2267a5c4d62038010661ae0aa99a7"
 
 [metadata.files]
 appnope = [
