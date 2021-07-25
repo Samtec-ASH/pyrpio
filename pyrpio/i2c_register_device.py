@@ -1,6 +1,6 @@
 ''' Create a generic register device that runs over I2C. '''
 import struct
-from typing import Collection, Tuple
+from typing import Collection, Tuple, Optional
 from .i2c.types import I2CBase
 
 
@@ -25,7 +25,7 @@ class I2CRegisterDevice:
         self._register_size = register_size
         self._data_size = data_size
 
-    def read_register(self, register: int) -> int:
+    def read_register(self, register: int, mask: Optional[int] = None) -> int:
         '''
         Read single register as int
 
@@ -33,9 +33,12 @@ class I2CRegisterDevice:
             register (int): Register address
 
         Returns:
-            int: [description]
+            int: Register value
         '''
-        return int.from_bytes(self.read_register_bytes(register), byteorder='big')
+        value = int.from_bytes(self.read_register_bytes(register), byteorder='big')
+        if mask is not None:
+            value = value & mask
+        return value
 
     def read_register_bytes(self, register: int) -> bytes:
         '''
@@ -45,12 +48,12 @@ class I2CRegisterDevice:
             register (int): Register address
 
         Returns:
-            bytes: [description]
+            bytes: Register bytes
         '''
         self._bus.set_address(self._address)
         return self._bus.read_write(register.to_bytes(length=self._register_size, byteorder='big'), self._data_size)
 
-    def write_register(self, register: int, data: int):
+    def write_register(self, register: int, data: int, mask: Optional[int] = None):
         '''
         Write int data to signle register.
 
@@ -58,6 +61,10 @@ class I2CRegisterDevice:
             register (int): Register address
             data (int): Register value as int
         '''
+        if mask is not None:
+            pdata = self.read_register(
+                register, mask=~mask)
+            data = pdata | (data & mask)
         self.write_register_bytes(register, data.to_bytes(length=self._data_size, byteorder='big'))
 
     def write_register_bytes(self, register: int, data: bytes):
