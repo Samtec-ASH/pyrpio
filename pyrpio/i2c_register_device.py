@@ -62,8 +62,7 @@ class I2CRegisterDevice:
             data (int): Register value as int
         '''
         if mask is not None:
-            pdata = self.read_register(
-                register, mask=~mask)
+            pdata = self.read_register(register, mask=~mask)  # pylint: disable=E1130
             data = pdata | (data & mask)
         self.write_register_bytes(register, data.to_bytes(length=self._data_size, byteorder='big'))
 
