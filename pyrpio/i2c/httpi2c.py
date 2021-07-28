@@ -69,7 +69,7 @@ class HttpI2C(I2CBase):
         return base64.b64decode(r.content)
 
     def transfer(self, address: int, messages: List[I2CMessage]):
-        mdicts = [dataclasses.dataclasses.asdict(m) for m in messages]
+        mdicts = [dataclasses.asdict(m) for m in messages]
         r = self.client.post(f'{self.bus_path}/transfer/{address}', data=mdicts)
         r.raise_for_status()
 
