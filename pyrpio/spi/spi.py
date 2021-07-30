@@ -3,17 +3,11 @@ Adapted from python-periphery (https://github.com/vsergeev/python-periphery/blob
 Modified to support 3-wire mode (MOSI & MISO tied)
 '''
 import os
-from typing import Union, List, Optional
+from typing import Optional
 import fcntl
 import array
 import ctypes
-
-
-ByteLike = Union[bytes, bytearray, List[int]]
-
-
-class SPIError(IOError):
-    """Base class for SPI errors."""
+from .types import SPIBase, SPIError, ByteLike
 
 
 class _CSpiIocTransfer(ctypes.Structure):
@@ -32,7 +26,7 @@ class _CSpiIocTransfer(ctypes.Structure):
     ]
 
 
-class SPI:
+class SPI(SPIBase):
     ''' SPI class interface. '''
     SPI_3WIRE = 0x10
     # Constants scraped from <linux/spi/spidev.h>
@@ -81,6 +75,9 @@ class SPI:
 
     def __exit__(self, t, value, traceback):
         self.close()
+
+    def open(self):
+        pass
 
     def _open(self, devpath, mode, max_speed, bit_order, bits_per_word, extra_flags):
         if not isinstance(devpath, str):
@@ -137,7 +134,11 @@ class SPI:
             raise SPIError(e.errno, "Setting SPI bits per word: " + e.strerror) from e
 
     # Methods
-    def transfer(self, tx_data=None, rx_data=None, cs_change: bool = True) -> ByteLike:
+    def transfer(self,
+            tx_data: Optional[ByteLike] = None,
+            rx_data: Optional[ByteLike] = None,
+            cs_change: bool = True
+        ) -> ByteLike:
         """Shift out `data` and return shifted in data.
         Args:
             tx_data (bytes, bytearray, list): a byte array or list of 8-bit integers to shift out.

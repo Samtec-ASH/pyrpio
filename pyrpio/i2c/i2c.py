@@ -20,9 +20,7 @@ class _CI2CIocTransfer(ctypes.Structure):
     ]
 
 class I2C(I2CBase):
-    '''
-    Controller to handle an I2C bus
-    '''
+    """ Controller to handle an I2C bus """
     I2C_SLAVE = 0x0703
     # Constants scraped from <linux/i2c-dev.h> and <linux/i2c.h>
     _I2C_IOC_FUNCS = 0x705
@@ -38,34 +36,33 @@ class I2C(I2CBase):
     _I2C_M_RECV_LEN = 0x0400
 
     def __init__(self, path: str = '/dev/i2c-1'):
-        '''
-        Create an i2c bus with 7-bit addressing
+        """Create an i2c bus with 7-bit addressing
 
         Args:
-            path (str, optional): path of i2c bus. Defaults to '/dev/i2c-1'.
-        '''
+            path (str, optional): I2C descriptor file path. Defaults to '/dev/i2c-1'.
+        """
         self.path: str = path
         self._address = 0x0
         self._bus: Optional[IO[bytes]] = None
 
     def open(self):
-        '''
+        """
         Open the i2c bus
-        '''
+        """
         if not self._bus:
             self._bus = open(self.path, 'r+b', buffering=0)  # pylint: disable=consider-using-with
             self._address = 0x0
 
     def close(self):
-        '''
+        """
         Close the i2c bus
-        '''
+        """
         if self._bus:
             self._bus.close()
             self._bus = None
 
     def set_address(self, address: int):
-        '''
+        """
         Set the i2c bus address if it has changed
 
         Args:
@@ -73,7 +70,7 @@ class I2C(I2CBase):
 
         Raises:
             I2CError: Bus is not open
-        '''
+        """
         if self._bus is None:
             raise I2CError(f'Bus: {self.path} is not open')
         if address != self._address:
@@ -81,7 +78,7 @@ class I2C(I2CBase):
             self._address = address
 
     def read(self, length: int = 1) -> bytes:
-        '''
+        """
         Read amount of bytes back from i2c bus
 
         Args:
@@ -92,13 +89,13 @@ class I2C(I2CBase):
 
         Returns:
             bytes: read from i2c bus
-        '''
+        """
         if self._bus is None:
             raise I2CError(f'Bus: {self.path} is not open')
         return self._bus.read(length)
 
     def write(self, data: bytes):
-        '''
+        """
         Write amount of bytes on i2c bus
 
         Args:
@@ -106,13 +103,13 @@ class I2C(I2CBase):
 
         Raises:
             I2CError: Bus is not open
-        '''
+        """
         if self._bus is None:
             raise I2CError(f'Bus: {self.path} is not open')
         self._bus.write(data)
 
     def read_write(self, data: bytes, length: int = 1) -> bytes:
-        '''
+        """
         Perform read write operation to get information back from device on bus
 
         Args:
@@ -124,7 +121,7 @@ class I2C(I2CBase):
 
         Returns:
             bytes: infromation read back from device on bus
-        '''
+        """
         if self._bus is None:
             raise I2CError(f'Bus: {self.path} is not open')
         self._bus.write(data)
@@ -188,7 +185,7 @@ class I2C(I2CBase):
                     message.data = bytes(bytearray(data))
 
     def detect(self, first: int = 0x03, last: int = 0x77, data: Optional[bytes] = None, length: int = 1) -> List[int]:
-        '''
+        """
         Scans bus looking for devices.
 
         Args:
@@ -199,7 +196,7 @@ class I2C(I2CBase):
 
         Returns:
             List[int]: List of device base-10 addresses that responded.
-        '''
+        """
         addresses = []
         for i in range(first, last+1):
             try:

@@ -1,32 +1,33 @@
-''' I2C Types '''
+""" I2C Types """
 from abc import ABC
 from typing import Optional, List, Union
 from dataclasses import dataclass
 
 class I2CError(IOError):
-    '''
+    """
     Exceptions that occur during i2c operations. (before OS level ops)
-    '''
+    """
+    ...
 
 @dataclass
 class I2CMessage:
-    ''' I2C message for transfer operation. '''
+    """ I2C message for transfer operation. """
     data: Union[bytes, bytearray, List[int]]
     read: bool
     flags: int
 
 class I2CBase(ABC):
-    ''' Abstract base class for I2C. '''
+    """ Abstract base class for I2C. """
     def open(self):
-        ''' Open the i2c bus. '''
+        """ Open the i2c bus. """
         raise NotImplementedError()
 
     def close(self):
-        ''' Close the i2c bus. '''
+        """ Close the i2c bus. """
         raise NotImplementedError()
 
     def set_address(self, address: int):
-        '''
+        """
         Set the i2c bus address if it has changed
 
         Args:
@@ -34,11 +35,11 @@ class I2CBase(ABC):
 
         Raises:
             I2CError: Bus is not open
-        '''
+        """
         raise NotImplementedError()
 
     def read(self, length: int = 1) -> bytes:
-        '''
+        """
         Read amount of bytes back from i2c bus
 
         Args:
@@ -49,11 +50,11 @@ class I2CBase(ABC):
 
         Returns:
             bytes: read from i2c bus
-        '''
+        """
         raise NotImplementedError()
 
     def write(self, data: bytes):
-        '''
+        """
         Write amount of bytes on i2c bus
 
         Args:
@@ -61,11 +62,11 @@ class I2CBase(ABC):
 
         Raises:
             I2CError: Bus is not open
-        '''
+        """
         raise NotImplementedError()
 
     def read_write(self, data: bytes, length: int = 1) -> bytes:
-        '''
+        """
         Perform read write operation to get information back from device on bus
 
         Args:
@@ -77,7 +78,7 @@ class I2CBase(ABC):
 
         Returns:
             bytes: infromation read back from device on bus
-        '''
+        """
         raise NotImplementedError()
 
     def transfer(self, address: int, messages: List[I2CMessage]):
@@ -94,7 +95,7 @@ class I2CBase(ABC):
         raise NotImplementedError()
 
     def detect(self, first: int = 0x03, last: int = 0x77, data: Optional[bytes] = None, length: int = 1) -> List[int]:
-        '''
+        """
         Scans bus looking for devices.
 
         Args:
@@ -105,5 +106,5 @@ class I2CBase(ABC):
 
         Returns:
             List[int]: List of device base-10 addresses that responded.
-        '''
+        """
         raise NotImplementedError()

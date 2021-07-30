@@ -1,15 +1,15 @@
-''' Handles detecting pin mapping of given board. '''
+""" Handles detecting pin mapping of given board. """
 import re
 from typing import Optional
 from pyrpio.types import PinMapName, RPIOConfigs, RPIOBoard, RPIOMapping, PIN_MAPPINGS
 
 
 def detect_pinmap_name_dt() -> Optional[PinMapName]:
-    ''' Detect pinmap using device tree.
+    """ Detect pinmap using device tree.
         Args: None
         Returns:
             Optional[str]: Pinmap name
-    '''
+    """
     model = None
     try:
         with open('/proc/device-tree/model', 'r') as fp:
@@ -31,11 +31,11 @@ def detect_pinmap_name_dt() -> Optional[PinMapName]:
 
 
 def detect_pinmap_name() -> Optional[PinMapName]:
-    ''' Detect pinmap by extracting revision in /proc/cpuinfo.
+    """ Detect pinmap by extracting revision in /proc/cpuinfo.
         Args: None
         Returns:
             Optional[PinMapName]: Pinmap name
-    '''
+    """
     cpu_info = None
     try:
         with open('/proc/cpuinfo', 'r') as fp:
@@ -63,8 +63,14 @@ def detect_pinmap_name() -> Optional[PinMapName]:
 
 
 def set_mock_pinmap(configs: RPIOConfigs) -> Optional[PinMapName]:
-    ''' Get pinmap based on supplied mock board type.
-    '''
+    """Get pinmap based on supplied mock board type.
+
+    Args:
+        configs (RPIOConfigs): Configuration
+
+    Returns:
+        Optional[PinMapName]: Pin mapping based on config
+    """
     if configs.mock in [RPIOBoard.RASPI_B_R1]:
         return PinMapName.PINMAP_26_R1
     if configs.mock in [RPIOBoard.RASPI_A, RPIOBoard.RASPI_B]:
@@ -78,13 +84,13 @@ def set_mock_pinmap(configs: RPIOConfigs) -> Optional[PinMapName]:
 
 
 def pin_to_gpio(pin: int, configs: RPIOConfigs) -> int:
-    ''' Translate pin based on board and selected mapping.
+    """ Translate pin based on board and selected mapping.
     Args:
         pin (int): Pin number (physical or gpio #)
         configs (RPIOConfigs): Selected configs
     Return:
         int: Translated pin number
-    '''
+    """
     gpio_pin = pin
     if configs.mapping == RPIOMapping.physical:
         gpio_pin = PIN_MAPPINGS[configs.pinmap_name][pin]

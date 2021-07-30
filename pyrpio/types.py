@@ -1,4 +1,4 @@
-''' PyRPIO definitions: enums and dataclasses. '''
+""" PyRPIO definitions: enums and dataclasses. """
 
 from enum import Enum
 from typing import Optional, List
@@ -35,7 +35,7 @@ PAD_SLEW_UNLIMITED = 0x10
 
 
 class PinMapName(str, Enum):
-    ''' Board pin map name. '''
+    """ Board pin map name. """
     PINMAP_26_R1 = 'PINMAP_26_R1'
     PINMAP_26 = 'PINMAP_26'
     PINMAP_40 = 'PINMAP_40'
@@ -112,13 +112,13 @@ PIN_MAPPINGS = {
 
 
 class RPIOMapping(str, Enum):
-    ''' Pin mapping convention: physical or gpio. '''
+    """ Pin mapping convention: physical or gpio. """
     physical = 'physical'
     gpio = 'gpio'
 
 
 class RPIOBoard(str, Enum):
-    ''' Board names. '''
+    """ Board names. """
     RASPI_B_R1 = 'RASPI_B_R1'
     RASPI_A = 'RASPI_A'
     RASPI_B = 'RASPI_B'
@@ -133,7 +133,7 @@ class RPIOBoard(str, Enum):
 
 @dataclass
 class RPIOConfigs:
-    ''' PyRPIO configuration options. '''
+    """ PyRPIO configuration options. """
     gpiomem: bool = True
     mapping: RPIOMapping = RPIOMapping.physical
     mock: Optional[RPIOBoard] = None

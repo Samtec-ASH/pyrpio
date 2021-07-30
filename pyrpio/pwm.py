@@ -1,7 +1,7 @@
-'''
+"""
 PWM interface.
 Copied from python-periphery (https://github.com/vsergeev/python-periphery/blob/master/periphery/pwm.py)
-'''
+"""
 import errno
 import os
 import time
@@ -9,10 +9,10 @@ import time
 
 class PWMError(IOError):
     """Base class for PWM errors."""
-
+    ...
 
 class PWM:
-    ''' PWM class interface. '''
+    """ PWM class interface. """
     # Number of retries to check for successful PWM export on open
     PWM_STAT_RETRIES = 10
     # Delay between check for scucessful PWM export on open (100ms)
@@ -134,17 +134,14 @@ class PWM:
     # Immutable properties
 
     @property
-    def devpath(self):
+    def devpath(self) -> str:
         """Get the device path of the underlying sysfs PWM device.
-        :type: str
         """
         return self._path
 
     @property
     def chip(self):
-        """Get the PWM chip number.
-        :type: int
-        """
+        """Get the PWM chip number. """
         return self._chip
 
     @property
@@ -183,7 +180,6 @@ class PWM:
     Raises:
         PWMError: if an I/O or OS error occurs.
         TypeError: if value type is not int.
-    :type: int
     """
 
     def _get_duty_cycle_ns(self):
@@ -207,7 +203,6 @@ class PWM:
     Raises:
         PWMError: if an I/O or OS error occurs.
         TypeError: if value type is not int.
-    :type: int
     """
 
     def _get_period(self):
@@ -225,7 +220,6 @@ class PWM:
     Raises:
         PWMError: if an I/O or OS error occurs.
         TypeError: if value type is not int or float.
-    :type: int, float
     """
 
     def _get_duty_cycle(self):
@@ -246,7 +240,6 @@ class PWM:
         PWMError: if an I/O or OS error occurs.
         TypeError: if value type is not int or float.
         ValueError: if value is out of bounds of 0.0 to 1.0.
-    :type: int, float
     """
 
     def _get_frequency(self):
@@ -263,7 +256,6 @@ class PWM:
     Raises:
         PWMError: if an I/O or OS error occurs.
         TypeError: if value type is not int or float.
-    :type: int, float
     """
 
     def _get_polarity(self):
@@ -283,7 +275,6 @@ class PWM:
         PWMError: if an I/O or OS error occurs.
         TypeError: if value type is not str.
         ValueError: if value is invalid.
-    :type: str
     """
 
     def _get_enabled(self):
@@ -307,7 +298,6 @@ class PWM:
     Raises:
         PWMError: if an I/O or OS error occurs.
         TypeError: if value type is not bool.
-    :type: bool
     """
 
     # String representation

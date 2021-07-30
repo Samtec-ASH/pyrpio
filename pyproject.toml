@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "PyRPIO"
-version = "0.3.0"
+version = "0.4.0"
 description = "Python-wrapped RPIO"
 authors = ["Adam Page <adam.page@samtec.com>"]
 license = "MIT"
@@ -8,6 +8,12 @@ readme = "README.md"
 repository = "https://github.com/Samtec-ASH/pyrpio"
 # include = ["pyrpio/lib/*.h"]
 # build = "build.py"
+
+[tool.taskipy.tasks]
+lint = "pylint --rcfile .pylintrc pyrpio"
+test = "pytest tests/"
+docs = "cd docs/ && sphinx-apidoc -f -o ./source ../pyrpio && make clean && make html"
+
 
 [tool.poetry.dependencies]
 python = "^3.7"
@@ -21,6 +27,11 @@ pylint = "*"
 autopep8 = "*"
 flake8 = "*"
 ipython = "*"
+myst-parser = "^0.15.1"
+sphinx-autodoc-typehints = "^1.12.0"
+sphinx-rtd-theme = "^0.5.2"
+Sphinx = "^4.1.2"
+taskipy = "^1.8.1"
 
 [tool.poetry.extras]
 ftdi = ["pyftdi"]

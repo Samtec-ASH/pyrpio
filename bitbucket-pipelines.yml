@@ -11,8 +11,8 @@ pipelines:
         script:
           - pip install poetry
           - poetry install
-          - poetry run pytest tests/
-          - poetry run pylint --rcfile .pylintrc pyrpio
+          - poetry run task test
+          - poetry run task lint
     - step:
         name: Deploy to test
         deployment: test
@@ -23,8 +23,8 @@ pipelines:
         script:
           - pip install poetry
           - poetry install
-          - poetry run pytest tests/
-          - poetry run pylint --rcfile .pylintrc pyrpio
+          - poetry run task test
+          - poetry run task lint
     - step:
         name: Deploy to staging
         deployment: staging
