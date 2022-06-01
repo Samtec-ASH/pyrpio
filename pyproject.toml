@@ -18,7 +18,7 @@ docs = "cd docs/ && sphinx-apidoc -f -o ./source ../pyrpio && make clean && make
 [tool.poetry.dependencies]
 python = "^3.7"
 pyftdi = {version = "^0.53.2", optional = true, allow-prereleases = true}
-httpx = {version = "^0.18.2", optional = true, allow-prereleases = true}
+httpx = {version = ">=0.18.2,<0.24.0", optional = true, allow-prereleases = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
